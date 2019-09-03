@@ -16,8 +16,6 @@ sources = [
 # subproject folders, and others in a catch-all extras/ directory. to simplify using
 # the resulting binaries, we reorganize everything using a flat bin/lib structure.
 
-# TODO: add back includes or nvcc is not functional. or remove nvcc/cicc/cudafe++
-
 script = raw"""
 cd ${WORKSPACE}/srcdir
 
@@ -42,10 +40,14 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     mv nvvm/libdevice ${prefix}/share
 
     # clean up
-    rm -f  ${prefix}/lib/*.a        # we can't use static libraries from Julia
-    rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
-    rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm -r  ${prefix}/bin/cuda-install-samples-*.sh
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvvp,nsight,computeprof}               # requires Java
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/cuda-install-samples-*.sh
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
 
@@ -54,14 +56,18 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # no lib folder; we don't ship static libs
 
     # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc nvgraph gpu-library-advisor nvprof nvprune; do
+    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
     mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
 
     # clean up
-    rm ${prefix}/bin/*.lib          # we can't use static libraries from Julia
+    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
+    rm    ${prefix}/bin/nvcc.profile
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
+    rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg
     7z x 5.hfs
@@ -81,11 +87,15 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     mv nvvm/libdevice ${prefix}/share
 
     # clean up
-    rm -f  ${prefix}/lib/*.a        # we can't use static libraries from Julia
-    rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
-    rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm -f  ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
-    rm -f  ${prefix}/bin/uninstall_cuda_*.pl
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvvp,nsight,computeprof}               # requires Java
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/uninstall_cuda_*.pl
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
 fi
 """
 
@@ -96,11 +106,8 @@ platforms = [
 ]
 
 # cuda-gdb, libnvjpeg, libOpenCL, libaccinj(64), libnvperf_host, libnvperf_target only on linux
-# nsight, nvvp not on windows -- full installer
 
 products(prefix) = [
-    ExecutableProduct(prefix, "nvcc", :nvcc),
-    ExecutableProduct(prefix, "cudafe++", :cudafepp),
     ExecutableProduct(prefix, "nvprof", :nvprof),
     ExecutableProduct(prefix, "ptxas", :ptxas),
     LibraryProduct(prefix, "libcudart", :libcudart),
