@@ -1,15 +1,15 @@
 using BinaryBuilder
 
 name = "CUDA"
-version = v"10.1.168"
+version = v"10.1.243"
 
 sources = [
-    "https://developer.nvidia.com/compute/cuda/10.1/Prod/cluster_management/cuda_cluster_pkgs_10.1.168_418.67_rhel6.tar.gz" =>
-    "965570c92de387cec04d77a2bdce26b6457b027c0b2b12dc537a5ca1c1aa82b3",
-    "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_mac.dmg" =>
-    "a53d17c92b81bb8b8f812d0886a8c2ddf2730be6f5f2659aee11c0da207c2331",
-    "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_425.25_win10.exe" =>
-    "52450b81a699cb75086e9d3d62abb2a33f823fcf5395444e57ebb5864cc2fd51",
+    "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/cluster_management/cuda_cluster_pkgs_10.1.243_418.87.00_rhel6.tar.gz" =>
+    "024b61d193105aef37241c89e511f0fec9dcecc2af416f2a1151f2a4dbbb3c29",
+    "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_mac.dmg" =>
+    "432a2f07a793f21320edc5d10e7f68a8e4e89465c31e1696290bdb0ca7c8c997",
+    "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe" =>
+    "35d3c99c58dd601b2a2caa28f44d828cae1eaf8beb70702732585fa001cd8ad7",
 ]
 
 # CUDA is weirdly organized, with several tools in bin/lib directories, some in dedicated
