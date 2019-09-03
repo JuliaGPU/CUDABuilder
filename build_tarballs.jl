@@ -16,7 +16,7 @@ sources = [
 # subproject folders, and others in a catch-all extras/ directory. to simplify using
 # the resulting binaries, we reorganize everything using a flat bin/lib structure.
 
-# TODO: cicc in nvvm bin
+# TODO: add back includes or nvcc is not functional. or remove nvcc/cicc/cudafe++
 
 script = raw"""
 cd ${WORKSPACE}/srcdir
@@ -35,6 +35,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     mkdir ${prefix}/share
 
     # subprojects
+    mv nvvm/bin/* ${prefix}/bin
     mv nvvm/lib64/* ${prefix}/lib
     mv nvvm/libdevice ${prefix}/share
 
@@ -45,20 +46,23 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm -f  ${prefix}/lib/*.a        # we can't use static libraries from Julia
     rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
     rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm -r  ${prefix}/bin/cuda-install-samples-10.1.sh
+    rm -r  ${prefix}/bin/cuda-install-samples-*.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
 
     mkdir -p ${prefix}/bin ${prefix}/share  # no lib folder; we don't ship static libs
 
     # subprojects
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc; do
+    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc nvgraph gpu-library-advisor nvprof nvprune; do
         mv ${project}/bin/* ${prefix}/bin/
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
 
     # extras
     mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
+
+    # clean up things we don't care about
+    rm ${prefix}/bin/*.lib          # we can't use static libraries from Julia
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg
     7z x 5.hfs
@@ -72,7 +76,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # subprojects
     mv nvvm/bin/* ${prefix}/bin
-    mv nvvm/lib/* ${prefix}/bin
+    mv nvvm/lib/* ${prefix}/lib
     mv nvvm/libdevice ${prefix}/share
 
     # extras
@@ -83,7 +87,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
     rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
     rm -f  ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
-    rm
+    rm -f  ${prefix}/bin/uninstall_cuda_*.pl
 fi
 """
 
@@ -92,6 +96,9 @@ platforms = [
     Windows(:x86_64),
     MacOS(:x86_64),
 ]
+
+# cuda-gdb, libnvjpeg, libOpenCL, libaccinj(64), libnvperf_host, libnvperf_target only on linux
+# nsight, nvvp not on windows -- full installer
 
 products(prefix) = [
     ExecutableProduct(prefix, "nvcc", :nvcc),
