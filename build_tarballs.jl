@@ -29,20 +29,19 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rpm2cpio cuda-cluster-devel*.rpm | cpio -idmv
     cd usr/local/cuda*
 
-    # essential files and hierarchy
+    # toplevel
     mv bin ${prefix}
     mv targets/x86_64-linux/lib ${prefix}
     mkdir ${prefix}/share
 
-    # subprojects
-    mv nvvm/bin/* ${prefix}/bin
-    mv nvvm/lib64/* ${prefix}/lib
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
+    done
     mv nvvm/libdevice ${prefix}/share
 
-    # extras
-    mv extras/CUPTI/lib64/* ${prefix}/lib
-
-    # clean up things we don't care about
+    # clean up
     rm -f  ${prefix}/lib/*.a        # we can't use static libraries from Julia
     rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
     rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
@@ -50,18 +49,18 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
 
-    mkdir -p ${prefix}/bin ${prefix}/share  # no lib folder; we don't ship static libs
+    # toplevel
+    mkdir -p ${prefix}/bin ${prefix}/share
+    # no lib folder; we don't ship static libs
 
-    # subprojects
+    # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc nvgraph gpu-library-advisor nvprof nvprune; do
-        mv ${project}/bin/* ${prefix}/bin/
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
-
-    # extras
     mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
 
-    # clean up things we don't care about
+    # clean up
     rm ${prefix}/bin/*.lib          # we can't use static libraries from Julia
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg
@@ -69,20 +68,19 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     tar -zxvf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
 
-    # essential files and hierarchy
+    # toplevel
     mv bin ${prefix}
     mv lib ${prefix}
     mkdir ${prefix}/share
 
-    # subprojects
-    mv nvvm/bin/* ${prefix}/bin
-    mv nvvm/lib/* ${prefix}/lib
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
+    done
     mv nvvm/libdevice ${prefix}/share
 
-    # extras
-    mv extras/CUPTI/lib/* ${prefix}/lib
-
-    # clean up things we don't care about
+    # clean up
     rm -f  ${prefix}/lib/*.a        # we can't use static libraries from Julia
     rm -rf ${prefix}/lib/stubs/     # stubs are a C/C++ thing
     rm -r  ${prefix}/bin/nsight_ee_plugins_manage.sh
