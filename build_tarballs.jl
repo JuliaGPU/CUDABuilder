@@ -13,7 +13,7 @@ sources = [
 ]
 
 # CUDA is weirdly organized, with several tools in bin/lib directories, some in dedicated
-# subproject folders, and others in a catch-all extras/ directory. to simplify using
+# subproject folders, and others in a catch-all extras/ directory. to simplify use of
 # the resulting binaries, we reorganize everything using a flat bin/lib structure.
 
 script = raw"""
@@ -53,7 +53,8 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # no lib folder; we don't ship static libs
 
     # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
+                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
