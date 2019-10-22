@@ -23,6 +23,7 @@ apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
     sh cuda_*_linux.run --target "${PWD}" --noexec --tar -xvf
+    rm cuda_*
     cd builds/cuda-toolkit
 
     # toplevel
@@ -47,6 +48,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
+    rm cuda_*
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -67,9 +69,12 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg
+    7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg 5.hfs
+    rm cuda_*
     7z x 5.hfs
+    rm 5.hfs
     tar -zxvf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
+    rm -rf CUDAMacOSXInstaller
     cd Developer/NVIDIA/CUDA-*/
 
     # toplevel
