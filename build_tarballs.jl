@@ -4,8 +4,8 @@ name = "CUDA"
 version = v"10.1.243"
 
 sources = [
-    "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/cluster_management/cuda_cluster_pkgs_10.1.243_418.87.00_rhel6.tar.gz" =>
-    "024b61d193105aef37241c89e511f0fec9dcecc2af416f2a1151f2a4dbbb3c29",
+    "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run" =>
+    "e7c22dc21278eb1b82f34a60ad7640b41ad3943d929bebda3008b72536855d31",
     "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_mac.dmg" =>
     "432a2f07a793f21320edc5d10e7f68a8e4e89465c31e1696290bdb0ca7c8c997",
     "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe" =>
@@ -22,10 +22,8 @@ cd ${WORKSPACE}/srcdir
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    cd cuda_cluster_pkgs*
-    rpm2cpio cuda-cluster-runtime*.rpm | cpio -idmv
-    rpm2cpio cuda-cluster-devel*.rpm | cpio -idmv
-    cd usr/local/cuda*
+    sh cuda_*_linux.run --target "${PWD}" --noexec --tar -xvf
+    cd builds/cuda-toolkit
 
     # toplevel
     mv bin ${prefix}
@@ -46,7 +44,6 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{nvvp,nsight,computeprof}               # requires Java
     rm    ${prefix}/lib/*.a                                     # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/cuda-install-samples-*.sh
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
