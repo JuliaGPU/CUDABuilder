@@ -42,10 +42,12 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
     rm -r ${prefix}/bin/crt/
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvvp,nsight,computeprof}               # requires Java
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
+    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
     rm    ${prefix}/lib/*.a                                     # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    rm    ${prefix}/bin/cuda-uninstaller
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb > ${prefix}/files/files.log
     rm cuda_*
@@ -95,7 +97,8 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
     rm -r ${prefix}/bin/crt/
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvvp,nsight,computeprof}               # requires Java
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
+    rm    ${prefix}/bin/cuda-memcheck                           # debugging
     rm    ${prefix}/lib/*.a                                     # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/uninstall_cuda_*.pl
@@ -110,21 +113,25 @@ platforms = [
     MacOS(:x86_64),
 ]
 
-# cuda-gdb, libnvjpeg, libOpenCL, libaccinj(64), libnvperf_host, libnvperf_target only on linux
+# libnvjpeg, libOpenCL, libaccinj(64), libnvperf_host, libnvperf_target only on linux
 
 products(prefix) = [
-    ExecutableProduct(prefix, "nvprof", :nvprof),
+    ExecutableProduct(prefix, "nvdisasm", :nvdisasm),
+    ExecutableProduct(prefix, "cuobjdump", :cuobjdump),
+    ExecutableProduct(prefix, "fatbinary", :fatbinary),
     ExecutableProduct(prefix, "ptxas", :ptxas),
-    LibraryProduct(prefix, "libcudart", :libcudart),
-    LibraryProduct(prefix, "libcufft", :libcufft),
-    LibraryProduct(prefix, "libcufftw", :libcufftw),
-    LibraryProduct(prefix, "libcurand", :libcurand),
-    LibraryProduct(prefix, "libcublas", :libcublas),
-    LibraryProduct(prefix, "libcusolver", :libcusolver),
-    LibraryProduct(prefix, "libcusparse", :libcusparse),
-    LibraryProduct(prefix, "libnvrtc", :libnvrtc),
+    ExecutableProduct(prefix, "nvprune", :nvprune),
+    ExecutableProduct(prefix, "nvlink", :nvlink),
+    FileProduct(prefix, "share/libdevice/libdevice.10.bc", :libdevice),
+    LibraryProduct(prefix, ["libcudart", "cudart", "cudart64_101"], :libcudart),
+    LibraryProduct(prefix, ["libcufft", "cufft", "cufft64_10"], :libcufft),
+    LibraryProduct(prefix, ["libcufftw", "cufftw", "cufftw64_10"], :libcufftw),
+    LibraryProduct(prefix, ["libcurand", "curand", "curand64_10"], :libcurand),
+    LibraryProduct(prefix, ["libcublas", "cublas", "cublas64_10"], :libcublas),
+    LibraryProduct(prefix, ["libcusolver", "cusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(prefix, ["libcusparse", "cusparse", "cusparse64_10"], :libcusparse),
 ]
 
 dependencies = []
 
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; skip_audit=true)
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
