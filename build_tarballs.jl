@@ -14,6 +14,24 @@ platforms = [
 
 dependencies = []
 
+# since this is a multi-version builder, make it possible to specify which version to build
+function extract_flag(flag, val = nothing)
+    for f in ARGS
+        if startswith(f, flag)
+            # Check if it's just `--flag` or if it's `--flag=foo`
+            if f != flag
+                val = split(f, '=')[2]
+            end
+
+            # Drop this value from our ARGS
+            ARGS = filter!(x -> x != f, ARGS)
+            return (true, val)
+        end
+    end
+    return (false, val)
+end
+_, requested_version = extract_flag("--version")
+
 
 #
 # CUDA 10.1
@@ -141,7 +159,9 @@ products = [
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_10"], :libcusparse),
 ]
 
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+if requested_version === nothing || requested_version == "10.1"
+    build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+end
 
 
 #
@@ -272,7 +292,9 @@ products = [
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_100"], :libcusparse),
 ]
 
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+if requested_version === nothing || requested_version == "10.0"
+    build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+end
 
 
 #
@@ -401,7 +423,9 @@ products = [
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_92"], :libcusparse),
 ]
 
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+if requested_version === nothing || requested_version == "9.2"
+    build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+end
 
 
 #
@@ -530,4 +554,6 @@ products = [
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_90"], :libcusparse),
 ]
 
-build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+if requested_version === nothing || requested_version == "9.0"
+    build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+end
