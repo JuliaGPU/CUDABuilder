@@ -65,7 +65,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
+        [[ -d ${project}/bin ]]   && mv ${project}/bin/*   ${prefix}/bin
         [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
     done
     mv nvvm/libdevice ${prefix}/share
@@ -91,6 +92,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
@@ -123,6 +125,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
     done
@@ -199,6 +202,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
     done
@@ -224,6 +228,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
@@ -256,6 +261,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
     done
@@ -332,6 +338,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
     done
@@ -357,6 +364,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
@@ -387,6 +395,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
     done
@@ -463,6 +472,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
     done
@@ -488,6 +498,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # nested
     for project in cuobjdump memcheck compiler compiler/nvvm nvdisasm curand cusparse npp \
                    cufft cublas cudart cusolver nvrtc nvgraph command_line_tools; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
     mv compiler/nvvm/libdevice ${prefix}/share
@@ -518,6 +529,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # nested
     for project in nvvm extras/CUPTI; do
+        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
         [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
     done
