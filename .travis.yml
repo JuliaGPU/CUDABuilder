@@ -64,7 +64,7 @@ before_script:
   - julia -e 'using Pkg; Pkg.instantiate()'
 
 script:
-  - julia build_tarballs.jl --version=$VERSION $TARGET
+  - julia --color=yes build_tarballs.jl --verbose --version=$VERSION $TARGET
 
 # deploy:
 #   provider: releases
