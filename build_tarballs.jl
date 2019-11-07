@@ -24,7 +24,7 @@ function extract_flag(flag, val = nothing)
             end
 
             # Drop this value from our ARGS
-            ARGS = filter!(x -> x != f, ARGS)
+            filter!(x -> x != f, ARGS)
             return (true, val)
         end
     end
