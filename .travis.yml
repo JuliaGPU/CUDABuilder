@@ -6,15 +6,6 @@ julia:
 notifications:
   email: false
 
-cache:
-  timeout: 1000
-  directories:
-    - storage
-
-env:
-  global:
-    - BINARYBUILDER_STORAGE_DIR=storage
-
 jobs:
   include:
     # 10.1
