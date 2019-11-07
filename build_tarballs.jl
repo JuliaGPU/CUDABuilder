@@ -58,12 +58,13 @@ if requested_source == nothing || requested_source == "win10"
 end
 
 script = raw"""
+mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux.run --target "${PWD}" --noexec
+    sh *-cuda_*_linux.run --tmpdir="${WORKSPACE}/tmpdir" --target "${PWD}" --noexec
     rm *-cuda_*
     cd builds/cuda-toolkit
 
@@ -197,14 +198,14 @@ if requested_source == nothing || requested_source == "win10"
 end
 
 script = raw"""
+mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux --target "${PWD}" --noexec
+    sh *-cuda_*_linux --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
     rm *-cuda_*
-    cd run_files/
     sh cuda-linux.*.run --noexec --keep
     rm *.run
     cd pkg
@@ -338,14 +339,14 @@ if requested_source == nothing || requested_source == "win10"
 end
 
 script = raw"""
+mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux --target "${PWD}" --noexec
+    sh *-cuda_*_linux --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
     rm *-cuda_*
-    cd run_files/
     sh cuda-linux.*.run --noexec --keep
     rm *.run
     cd pkg
@@ -477,14 +478,14 @@ if requested_source == nothing || requested_source == "win10"
 end
 
 script = raw"""
+mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux-run --target "${PWD}" --noexec
+    sh *-cuda_*_linux-run --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
     rm *-cuda_*
-    cd run_files/
     sh cuda-linux.*.run --noexec --keep
     rm *.run
     cd pkg
