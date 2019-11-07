@@ -22,7 +22,7 @@ cd ${WORKSPACE}/srcdir
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh cuda_*_linux.run --target "${PWD}" --noexec --tar -xvf
+    sh cuda_*_linux.run --target "${PWD}" --noexec --tar -xvf > ${prefix}/log/files.log
     rm cuda_*
     cd builds/cuda-toolkit
 
@@ -47,7 +47,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb
+    7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb > ${prefix}/files/files.log
     rm cuda_*
 
     # toplevel
@@ -67,13 +67,15 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/nvcc.profile
     rm -r ${prefix}/bin/crt/
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
+    rm    ${prefix}/bin/nvprof.exe                              # profiling
+    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg 5.hfs
     rm cuda_*
     7z x 5.hfs
     rm 5.hfs
-    tar -zxvf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
+    tar -zxvf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz  > ${prefix}/log/files.log
     rm -rf CUDAMacOSXInstaller
     cd Developer/NVIDIA/CUDA-*/
 
