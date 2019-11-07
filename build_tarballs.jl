@@ -1,6 +1,24 @@
 using BinaryBuilder
 
+# CUDA is weirdly organized, with several tools in bin/lib directories, some in dedicated
+# subproject folders, and others in a catch-all extras/ directory. to simplify use of
+# the resulting binaries, we reorganize everything using a flat bin/lib structure.
+
 name = "CUDA"
+
+platforms = [
+    Linux(:x86_64),
+    Windows(:x86_64),
+    MacOS(:x86_64),
+]
+
+dependencies = []
+
+
+#
+# CUDA 10.1
+#
+
 version = v"10.1.243"
 
 sources = [
@@ -12,18 +30,14 @@ sources = [
     "35d3c99c58dd601b2a2caa28f44d828cae1eaf8beb70702732585fa001cd8ad7",
 ]
 
-# CUDA is weirdly organized, with several tools in bin/lib directories, some in dedicated
-# subproject folders, and others in a catch-all extras/ directory. to simplify use of
-# the resulting binaries, we reorganize everything using a flat bin/lib structure.
-
 script = raw"""
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh cuda_*_linux.run --target "${PWD}" --noexec --tar -xvf > ${prefix}/log/files.log
-    rm cuda_*
+    sh *-cuda_*_linux.run --target "${PWD}" --noexec
+    rm *-cuda_*
     cd builds/cuda-toolkit
 
     # toplevel
@@ -49,8 +63,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
     rm    ${prefix}/bin/cuda-uninstaller
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x ${WORKSPACE}/srcdir/cuda_*_win10.exe -bb > ${prefix}/files/files.log
-    rm cuda_*
+    7z x *-cuda_*_win10.exe
+    rm *-cuda_*
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -64,6 +78,9 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     mv nvcc/nvvm/libdevice ${prefix}/share
     mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
 
+    # fixup
+    chmod +x ${prefix}/bin/*.exe
+
     # clean up
     rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
     rm    ${prefix}/bin/nvcc.profile
@@ -73,11 +90,11 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x ${WORKSPACE}/srcdir/cuda_*_mac.dmg 5.hfs
-    rm cuda_*
+    7z x *-cuda_*_mac.dmg 5.hfs
+    rm *-cuda_*
     7z x 5.hfs
     rm 5.hfs
-    tar -zxvf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz  > ${prefix}/log/files.log
+    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     rm -rf CUDAMacOSXInstaller
     cd Developer/NVIDIA/CUDA-*/
 
@@ -107,31 +124,410 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 fi
 """
 
-platforms = [
-    Linux(:x86_64),
-    Windows(:x86_64),
-    MacOS(:x86_64),
+products = [
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    ExecutableProduct("cuobjdump", :cuobjdump),
+    ExecutableProduct("fatbinary", :fatbinary),
+    ExecutableProduct("ptxas", :ptxas),
+    ExecutableProduct("nvprune", :nvprune),
+    ExecutableProduct("nvlink", :nvlink),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    LibraryProduct(["libcudart", "cudart", "cudart64_101"], :libcudart),
+    LibraryProduct(["libcufft", "cufft", "cufft64_10"], :libcufft),
+    LibraryProduct(["libcufftw", "cufftw", "cufftw64_10"], :libcufftw),
+    LibraryProduct(["libcurand", "curand", "curand64_10"], :libcurand),
+    LibraryProduct(["libcublas", "cublas", "cublas64_10"], :libcublas),
+    LibraryProduct(["libcusolver", "cusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(["libcusparse", "cusparse", "cusparse64_10"], :libcusparse),
 ]
 
-# libnvjpeg, libOpenCL, libaccinj(64), libnvperf_host, libnvperf_target only on linux
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
 
-products(prefix) = [
-    ExecutableProduct(prefix, "nvdisasm", :nvdisasm),
-    ExecutableProduct(prefix, "cuobjdump", :cuobjdump),
-    ExecutableProduct(prefix, "fatbinary", :fatbinary),
-    ExecutableProduct(prefix, "ptxas", :ptxas),
-    ExecutableProduct(prefix, "nvprune", :nvprune),
-    ExecutableProduct(prefix, "nvlink", :nvlink),
-    FileProduct(prefix, "share/libdevice/libdevice.10.bc", :libdevice),
-    LibraryProduct(prefix, ["libcudart", "cudart", "cudart64_101"], :libcudart),
-    LibraryProduct(prefix, ["libcufft", "cufft", "cufft64_10"], :libcufft),
-    LibraryProduct(prefix, ["libcufftw", "cufftw", "cufftw64_10"], :libcufftw),
-    LibraryProduct(prefix, ["libcurand", "curand", "curand64_10"], :libcurand),
-    LibraryProduct(prefix, ["libcublas", "cublas", "cublas64_10"], :libcublas),
-    LibraryProduct(prefix, ["libcusolver", "cusolver", "cusolver64_10"], :libcusolver),
-    LibraryProduct(prefix, ["libcusparse", "cusparse", "cusparse64_10"], :libcusparse),
+
+#
+# CUDA 10.0
+#
+
+version = v"10.0.130"
+
+sources = [
+    "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux" =>
+    "92351f0e4346694d0fcb4ea1539856c9eb82060c25654463bfd8574ec35ee39a",
+    "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_mac" =>
+    "4f76261ed46d0d08a597117b8cacba58824b8bb1e1d852745658ac873aae5c8e",
+    "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10" =>
+    "9dae54904570272c1fcdb10f5f19c71196b4fdf3ad722afa0862a238d7c75e6f",
 ]
 
-dependencies = []
+script = raw"""
+cd ${WORKSPACE}/srcdir
+
+apk add p7zip rpm
+
+if [[ ${target} == x86_64-linux-gnu ]]; then
+    sh *-cuda_*_linux --target "${PWD}" --noexec
+    rm *-cuda_*
+    cd run_files/
+    sh cuda-linux.*.run --noexec --keep
+    rm *.run
+    cd pkg
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib64 ${prefix}/lib
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+elif [[ ${target} == x86_64-w64-mingw32 ]]; then
+    7z x *-cuda_*_win10
+    rm *-cuda_*
+
+    # toplevel
+    mkdir -p ${prefix}/bin ${prefix}/share
+    # no lib folder; we don't ship static libs
+
+    # nested
+    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
+                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+    done
+    mv nvcc/nvvm/libdevice ${prefix}/share
+    mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
+
+    # fixup
+    chmod +x ${prefix}/bin/*.exe
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
+    rm    ${prefix}/bin/nvcc.profile
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
+    rm    ${prefix}/bin/nvprof.exe                              # profiling
+    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
+    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+elif [[ ${target} == x86_64-apple-darwin* ]]; then
+    7z x *-cuda_*_mac 5.hfs
+    rm *-cuda_*
+    7z x 5.hfs
+    rm 5.hfs
+    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
+    rm -rf CUDAMacOSXInstaller
+    cd Developer/NVIDIA/CUDA-*/
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib ${prefix}
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/cuda-memcheck                           # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/uninstall_cuda_*.pl
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+fi
+"""
+
+products = [
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    ExecutableProduct("cuobjdump", :cuobjdump),
+    ExecutableProduct("fatbinary", :fatbinary),
+    ExecutableProduct("ptxas", :ptxas),
+    ExecutableProduct("nvprune", :nvprune),
+    ExecutableProduct("nvlink", :nvlink),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    LibraryProduct(["libcudart", "cudart", "cudart64_100"], :libcudart),
+    LibraryProduct(["libcufft", "cufft", "cufft64_100"], :libcufft),
+    LibraryProduct(["libcufftw", "cufftw", "cufftw64_100"], :libcufftw),
+    LibraryProduct(["libcurand", "curand", "curand64_100"], :libcurand),
+    LibraryProduct(["libcublas", "cublas", "cublas64_100"], :libcublas),
+    LibraryProduct(["libcusolver", "cusolver", "cusolver64_100"], :libcusolver),
+    LibraryProduct(["libcusparse", "cusparse", "cusparse64_100"], :libcusparse),
+]
+
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+
+
+#
+# CUDA 9.2
+#
+
+version = v"9.2.148"
+
+sources = [
+    "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_396.37_linux" =>
+    "f5454ec2cfdf6e02979ed2b1ebc18480d5dded2ef2279e9ce68a505056da8611",
+    "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_mac" =>
+    "defb095aa002301f01b2f41312c9b1630328847800baa1772fe2bbb811d5fa9f",
+    "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers2/cuda_9.2.148_win10" =>
+    "7d99a6d135587d029c2cf159ade4e71c02fc1a922a5ffd06238b2bde8bedc362",
+]
+
+script = raw"""
+cd ${WORKSPACE}/srcdir
+
+apk add p7zip rpm
+
+if [[ ${target} == x86_64-linux-gnu ]]; then
+    sh *-cuda_*_linux --target "${PWD}" --noexec
+    rm *-cuda_*
+    cd run_files/
+    sh cuda-linux.*.run --noexec --keep
+    rm *.run
+    cd pkg
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib64 ${prefix}/lib
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+elif [[ ${target} == x86_64-w64-mingw32 ]]; then
+    7z x *-cuda_*_win10
+    rm *-cuda_*
+
+    # toplevel
+    mkdir -p ${prefix}/bin ${prefix}/share
+    # no lib folder; we don't ship static libs
+
+    # nested
+    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
+                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+    done
+    mv nvcc/nvvm/libdevice ${prefix}/share
+    mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
+
+    # fixup
+    chmod +x ${prefix}/bin/*.exe
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
+    rm    ${prefix}/bin/nvcc.profile
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
+    rm    ${prefix}/bin/nvprof.exe                              # profiling
+    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
+    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+elif [[ ${target} == x86_64-apple-darwin* ]]; then
+    7z x *-cuda_*_mac
+    rm *-cuda_*
+    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
+    rm -rf CUDAMacOSXInstaller
+    cd Developer/NVIDIA/CUDA-*/
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib ${prefix}
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/cuda-memcheck                           # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/uninstall_cuda_*.pl
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+fi
+"""
+
+products = [
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    ExecutableProduct("cuobjdump", :cuobjdump),
+    ExecutableProduct("fatbinary", :fatbinary),
+    ExecutableProduct("ptxas", :ptxas),
+    ExecutableProduct("nvprune", :nvprune),
+    ExecutableProduct("nvlink", :nvlink),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    LibraryProduct(["libcudart", "cudart", "cudart64_92"], :libcudart),
+    LibraryProduct(["libcufft", "cufft", "cufft64_92"], :libcufft),
+    LibraryProduct(["libcufftw", "cufftw", "cufftw64_92"], :libcufftw),
+    LibraryProduct(["libcurand", "curand", "curand64_92"], :libcurand),
+    LibraryProduct(["libcublas", "cublas", "cublas64_92"], :libcublas),
+    LibraryProduct(["libcusolver", "cusolver", "cusolver64_92"], :libcusolver),
+    LibraryProduct(["libcusparse", "cusparse", "cusparse64_92"], :libcusparse),
+]
+
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
+
+
+#
+# CUDA 9.0
+#
+
+version = v"9.0.176"
+
+sources = [
+    "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run" =>
+    "96863423feaa50b5c1c5e1b9ec537ef7ba77576a3986652351ae43e66bcd080c",
+    "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_mac-dmg" =>
+    "8fad950098337d2611d64617ca9f62c319d97c5e882b8368ed196e994bdaf225",
+    "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_win10-exe" =>
+    "615946c36c415d7d37b22dbade54469f0ed037b1b6470d6b8a108ab585e2621a",
+]
+
+script = raw"""
+cd ${WORKSPACE}/srcdir
+
+apk add p7zip rpm
+
+if [[ ${target} == x86_64-linux-gnu ]]; then
+    sh *-cuda_*_linux-run --target "${PWD}" --noexec
+    rm *-cuda_*
+    cd run_files/
+    sh cuda-linux.*.run --noexec --keep
+    rm *.run
+    cd pkg
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib64 ${prefix}/lib
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+elif [[ ${target} == x86_64-w64-mingw32 ]]; then
+    7z x *-cuda_*_win10-exe
+    rm *-cuda_*
+
+    # toplevel
+    mkdir -p ${prefix}/bin ${prefix}/share
+    # no lib folder; we don't ship static libs
+
+    # nested
+    for project in cuobjdump memcheck compiler compiler/nvvm nvdisasm curand cusparse npp \
+                   cufft cublas cudart cusolver nvrtc nvgraph command_line_tools; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+    done
+    mv compiler/nvvm/libdevice ${prefix}/share
+    mv command_line_tools/extras/CUPTI/libx64/* ${prefix}/bin/
+
+    # fixup
+    chmod +x ${prefix}/bin/*.exe
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
+    rm    ${prefix}/bin/nvcc.profile
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
+    rm    ${prefix}/bin/nvprof.exe                              # profiling
+    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
+    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+elif [[ ${target} == x86_64-apple-darwin* ]]; then
+    7z x *-cuda_*_mac-dmg
+    rm *-cuda_*
+    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
+    rm -rf CUDAMacOSXInstaller
+    cd Developer/NVIDIA/CUDA-*/
+
+    # toplevel
+    mv bin ${prefix}
+    mv lib ${prefix}
+    mkdir ${prefix}/share
+
+    # nested
+    for project in nvvm extras/CUPTI; do
+        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
+    done
+    mv nvvm/libdevice ${prefix}/share
+
+    # clean up
+    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
+    rm -r ${prefix}/bin/crt/
+    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
+    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
+    rm    ${prefix}/bin/cuda-memcheck                           # debugging
+    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
+    rm    ${prefix}/bin/uninstall_cuda_*.pl
+    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+fi
+"""
+
+products = [
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    ExecutableProduct("cuobjdump", :cuobjdump),
+    ExecutableProduct("fatbinary", :fatbinary),
+    ExecutableProduct("ptxas", :ptxas),
+    ExecutableProduct("nvprune", :nvprune),
+    ExecutableProduct("nvlink", :nvlink),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    LibraryProduct(["libcudart", "cudart", "cudart64_90"], :libcudart),
+    LibraryProduct(["libcufft", "cufft", "cufft64_90"], :libcufft),
+    LibraryProduct(["libcufftw", "cufftw", "cufftw64_90"], :libcufftw),
+    LibraryProduct(["libcurand", "curand", "curand64_90"], :libcurand),
+    LibraryProduct(["libcublas", "cublas", "cublas64_90"], :libcublas),
+    LibraryProduct(["libcusolver", "cusolver", "cusolver64_90"], :libcusolver),
+    LibraryProduct(["libcusparse", "cusparse", "cusparse64_90"], :libcusparse),
+]
 
 build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies)
