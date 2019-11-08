@@ -69,6 +69,7 @@ apk add p7zip
 if [[ ${target} == x86_64-linux-gnu ]]; then
     sh *-cuda_*_linux.run --tmpdir="${temp}" --target "${temp}" --noexec
     cd ${temp}/builds/cuda-toolkit
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -96,6 +97,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10.exe -o${temp}
     cd ${temp}
+    find .
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -127,6 +129,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x 5.hfs
     tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -207,6 +210,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}
     sh cuda-linux.*.run --noexec --keep
     cd pkg
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -233,6 +237,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10 -o${temp}
     cd ${temp}
+    find .
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -264,6 +269,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x 5.hfs
     tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -344,6 +350,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}
     sh cuda-linux.*.run --noexec --keep
     cd pkg
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -370,6 +377,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10 -o${temp}
     cd ${temp}
+    find .
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -400,6 +408,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd ${temp}
     tar -xzf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -480,6 +489,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}
     sh cuda-linux.*.run --noexec --keep
     cd pkg
+    find .
 
     # toplevel
     mv bin ${prefix}
@@ -506,6 +516,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10-exe -o${temp}
     cd ${temp}
+    find .
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -536,6 +547,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd ${temp}
     tar -xzf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
+    find .
 
     # toplevel
     mv bin ${prefix}
