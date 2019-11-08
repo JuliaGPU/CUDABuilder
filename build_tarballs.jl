@@ -521,8 +521,8 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # no lib folder; we don't ship static libs
 
     # nested
-    for project in cuobjdump memcheck compiler compiler/nvvm nvdisasm curand cusparse npp \
-                   cufft cublas cudart cusolver nvrtc nvgraph command_line_tools; do
+    for project in compiler compiler/nvvm curand cusparse npp cufft cublas cudart \
+                   cusolver nvrtc nvgraph command_line_tools; do
         [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
     done
