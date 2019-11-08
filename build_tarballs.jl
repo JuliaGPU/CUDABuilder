@@ -34,7 +34,7 @@ _, requested_version = extract_flag("--version")
 
 # we really don't want to download all sources when only building a single target,
 # so make it possible to request so
-_, requested_source = extract_flag("--source")
+requested_targets = filter(f->!startswith(f, "--"), ARGS)
 
 
 #
@@ -44,15 +44,15 @@ _, requested_source = extract_flag("--source")
 version = v"10.1.243"
 
 sources = []
-if requested_source == nothing || requested_source == "linux"
+if isempty(requested_targets) || "x86_64-linux-gnu" in requested_targets
     push!(sources, "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run" =>
                    "e7c22dc21278eb1b82f34a60ad7640b41ad3943d929bebda3008b72536855d31")
 end
-if requested_source == nothing || requested_source == "mac"
+if isempty(requested_targets) || any(t->occursin(r"x86_64-apple-darwin", t), requested_targets)
     push!(sources, "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_mac.dmg" =>
                    "432a2f07a793f21320edc5d10e7f68a8e4e89465c31e1696290bdb0ca7c8c997")
 end
-if requested_source == nothing || requested_source == "win10"
+if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
     push!(sources, "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe" =>
                    "35d3c99c58dd601b2a2caa28f44d828cae1eaf8beb70702732585fa001cd8ad7")
 end
@@ -184,15 +184,15 @@ end
 version = v"10.0.130"
 
 sources = []
-if requested_source == nothing || requested_source == "linux"
+if isempty(requested_targets) || "x86_64-linux-gnu" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux" =>
                    "92351f0e4346694d0fcb4ea1539856c9eb82060c25654463bfd8574ec35ee39a")
 end
-if requested_source == nothing || requested_source == "mac"
+if isempty(requested_targets) || any(t->occursin(r"x86_64-apple-darwin", t), requested_targets)
     push!(sources, "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_mac" =>
                    "4f76261ed46d0d08a597117b8cacba58824b8bb1e1d852745658ac873aae5c8e")
 end
-if requested_source == nothing || requested_source == "win10"
+if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10" =>
                    "9dae54904570272c1fcdb10f5f19c71196b4fdf3ad722afa0862a238d7c75e6f")
 end
@@ -325,15 +325,15 @@ end
 version = v"9.2.148"
 
 sources = []
-if requested_source == nothing || requested_source == "linux"
+if isempty(requested_targets) || "x86_64-linux-gnu" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_396.37_linux" =>
                    "f5454ec2cfdf6e02979ed2b1ebc18480d5dded2ef2279e9ce68a505056da8611")
 end
-if requested_source == nothing || requested_source == "mac"
+if isempty(requested_targets) || any(t->occursin(r"x86_64-apple-darwin", t), requested_targets)
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_mac" =>
                    "defb095aa002301f01b2f41312c9b1630328847800baa1772fe2bbb811d5fa9f")
 end
-if requested_source == nothing || requested_source == "win10"
+if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers2/cuda_9.2.148_win10" =>
                    "7d99a6d135587d029c2cf159ade4e71c02fc1a922a5ffd06238b2bde8bedc362")
 end
@@ -464,15 +464,15 @@ end
 version = v"9.0.176"
 
 sources = []
-if requested_source == nothing || requested_source == "linux"
+if isempty(requested_targets) || "x86_64-linux-gnu" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run" =>
                    "96863423feaa50b5c1c5e1b9ec537ef7ba77576a3986652351ae43e66bcd080c")
 end
-if requested_source == nothing || requested_source == "mac"
+if isempty(requested_targets) || any(t->occursin(r"x86_64-apple-darwin", t), requested_targets)
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_mac-dmg" =>
                    "8fad950098337d2611d64617ca9f62c319d97c5e882b8368ed196e994bdaf225")
 end
-if requested_source == nothing || requested_source == "win10"
+if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
     push!(sources, "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_win10-exe" =>
                    "615946c36c415d7d37b22dbade54469f0ed037b1b6470d6b8a108ab585e2621a")
 end
