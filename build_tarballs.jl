@@ -90,7 +90,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
     rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
     rm    ${prefix}/bin/cuda-uninstaller
@@ -100,14 +100,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/share
-    # no lib folder; we don't ship static libs
+    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
         [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
     mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
@@ -122,7 +122,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
     rm    ${prefix}/bin/nvprof.exe                              # profiling
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac.dmg 5.hfs -o${temp}
     cd ${temp}
@@ -150,7 +150,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
     rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/uninstall_cuda_*.pl
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
@@ -231,7 +231,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
@@ -240,14 +240,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/share
-    # no lib folder; we don't ship static libs
+    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
         [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
     mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
@@ -262,7 +262,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
     rm    ${prefix}/bin/nvprof.exe                              # profiling
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac 5.hfs -o${temp}
     cd ${temp}
@@ -290,7 +290,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/uninstall_cuda_*.pl
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
@@ -371,7 +371,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
@@ -380,14 +380,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/share
-    # no lib folder; we don't ship static libs
+    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
                    cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
         [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
     done
     mv nvcc/nvvm/libdevice ${prefix}/share
     mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
@@ -402,7 +402,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
     rm    ${prefix}/bin/nvprof.exe                              # profiling
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac -o${temp}
     cd ${temp}
@@ -429,7 +429,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/uninstall_cuda_*.pl
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
@@ -510,7 +510,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
@@ -519,14 +519,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/share
-    # no lib folder; we don't ship static libs
+    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # nested
     for project in compiler compiler/nvvm curand cusparse npp cufft cublas cudart \
                    cusolver nvrtc nvgraph command_line_tools; do
         [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
         [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
+        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
     done
     mv compiler/nvvm/libdevice ${prefix}/share
     mv command_line_tools/extras/CUPTI/libx64/* ${prefix}/bin/
@@ -541,7 +541,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
     rm    ${prefix}/bin/nvprof.exe                              # profiling
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/bin/*.lib                                   # we can't link statically
+    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac-dmg -o${temp}
     cd ${temp}
@@ -568,7 +568,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
     rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
     rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*.a                                     # we can't link statically
+    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/uninstall_cuda_*.pl
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
