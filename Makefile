@@ -12,10 +12,10 @@ all: $(addprefix products/,$(PRODUCTS))
 # access parts of a string separated by dots
 word-dot = $(word $2,$(subst ., ,$1))
 
-products:
-	mkdir products
+build:
+	mkdir build
 
-products/CUDA.v%.$(EXT): build_tarballs.jl | products
+products/CUDA.v%.$(EXT): build_tarballs.jl | build
 	BINARYBUILDER_AUTOMATIC_APPLE=true \
 	julia --project $^ \
 		  $(call word-dot,$*,4) \
