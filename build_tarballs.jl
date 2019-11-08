@@ -59,6 +59,8 @@ end
 
 script = raw"""
 mkdir ${WORKSPACE}/tmpdir
+df -h ${WORKSPACE}/tmpdir
+df -h ${PWD}
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
@@ -199,6 +201,8 @@ end
 
 script = raw"""
 mkdir ${WORKSPACE}/tmpdir
+df -h ${WORKSPACE}/tmpdir
+df -h ${PWD}
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
@@ -340,6 +344,8 @@ end
 
 script = raw"""
 mkdir ${WORKSPACE}/tmpdir
+df -h ${WORKSPACE}/tmpdir
+df -h ${PWD}
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
@@ -479,6 +485,8 @@ end
 
 script = raw"""
 mkdir ${WORKSPACE}/tmpdir
+df -h ${WORKSPACE}/tmpdir
+df -h ${PWD}
 cd ${WORKSPACE}/srcdir
 
 apk add p7zip rpm
