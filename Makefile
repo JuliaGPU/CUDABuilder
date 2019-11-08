@@ -20,7 +20,7 @@ products/CUDA.v%.$(EXT): build_tarballs.jl | products
 	julia --project $^ \
 		  $(call word-dot,$*,4) \
 	      --version=$(call word-dot,$*,1).$(call word-dot,$*,2) \
-		  --verbose &> products/CUDA.v$*.log
+		  --verbose &> build/CUDA.v$*.log
 
 .PHONY: clean
 clean:
