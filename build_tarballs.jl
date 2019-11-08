@@ -58,15 +58,17 @@ if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
 end
 
 script = raw"""
-mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
+
+# use a temporary directory to avoid running out of tmpfs in srcdir
+temp=${WORKSPACE}/tmpdir
+mkdir ${temp}
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux.run --tmpdir="${WORKSPACE}/tmpdir" --target "${PWD}" --noexec
-    rm *-cuda_*
-    cd builds/cuda-toolkit
+    sh *-cuda_*_linux.run --tmpdir="${temp}" --target "${temp}" --noexec
+    cd ${temp}/builds/cuda-toolkit
 
     # toplevel
     mv bin ${prefix}
@@ -92,8 +94,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
     rm    ${prefix}/bin/cuda-uninstaller
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x *-cuda_*_win10.exe
-    rm *-cuda_*
+    7z x *-cuda_*_win10.exe -o${temp}
+    cd ${temp}
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -120,12 +122,10 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x *-cuda_*_mac.dmg 5.hfs
-    rm *-cuda_*
+    7z x *-cuda_*_mac.dmg 5.hfs -o${temp}
+    cd ${temp}
     7z x 5.hfs
-    rm 5.hfs
     tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
-    rm -rf CUDAMacOSXInstaller
     cd Developer/NVIDIA/CUDA-*/
 
     # toplevel
@@ -198,16 +198,18 @@ if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
 end
 
 script = raw"""
-mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
+
+# use a temporary directory to avoid running out of tmpfs in srcdir
+temp=${WORKSPACE}/tmpdir
+mkdir ${temp}
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
-    rm *-cuda_*
+    sh *-cuda_*_linux --tmpdir="${temp}" --extract="${temp}"
+    cd ${temp}
     sh cuda-linux.*.run --noexec --keep
-    rm *.run
     cd pkg
 
     # toplevel
@@ -233,8 +235,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x *-cuda_*_win10
-    rm *-cuda_*
+    7z x *-cuda_*_win10 -o${temp}
+    cd ${temp}
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -261,12 +263,10 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x *-cuda_*_mac 5.hfs
-    rm *-cuda_*
+    7z x *-cuda_*_mac 5.hfs -o${temp}
+    cd ${temp}
     7z x 5.hfs
-    rm 5.hfs
     tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
-    rm -rf CUDAMacOSXInstaller
     cd Developer/NVIDIA/CUDA-*/
 
     # toplevel
@@ -339,16 +339,18 @@ if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
 end
 
 script = raw"""
-mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
+
+# use a temporary directory to avoid running out of tmpfs in srcdir
+temp=${WORKSPACE}/tmpdir
+mkdir ${temp}
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
-    rm *-cuda_*
+    sh *-cuda_*_linux --tmpdir="${temp}" --extract="${temp}"
+    cd ${temp}
     sh cuda-linux.*.run --noexec --keep
-    rm *.run
     cd pkg
 
     # toplevel
@@ -374,8 +376,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x *-cuda_*_win10
-    rm *-cuda_*
+    7z x *-cuda_*_win10 -o${temp}
+    cd ${temp}
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -402,10 +404,9 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x *-cuda_*_mac
-    rm *-cuda_*
-    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
-    rm -rf CUDAMacOSXInstaller
+    7z x *-cuda_*_mac -o${temp}
+    cd ${temp}
+    tar -xzf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
 
     # toplevel
@@ -478,16 +479,18 @@ if isempty(requested_targets) || "x86_64-w64-mingw32" in requested_targets
 end
 
 script = raw"""
-mkdir ${WORKSPACE}/tmpdir
 cd ${WORKSPACE}/srcdir
+
+# use a temporary directory to avoid running out of tmpfs in srcdir
+temp=${WORKSPACE}/tmpdir
+mkdir ${temp}
 
 apk add p7zip rpm
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    sh *-cuda_*_linux-run --tmpdir="${WORKSPACE}/tmpdir" --extract="${PWD}"
-    rm *-cuda_*
+    sh *-cuda_*_linux-run --tmpdir="${temp}" --extract="${temp}"
+    cd ${temp}
     sh cuda-linux.*.run --noexec --keep
-    rm *.run
     cd pkg
 
     # toplevel
@@ -513,8 +516,8 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
     rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    7z x *-cuda_*_win10-exe
-    rm *-cuda_*
+    7z x *-cuda_*_win10-exe -o${temp}
+    cd ${temp}
 
     # toplevel
     mkdir -p ${prefix}/bin ${prefix}/share
@@ -541,10 +544,9 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
     rm    ${prefix}/bin/*.lib                                   # we can't link statically
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x *-cuda_*_mac-dmg
-    rm *-cuda_*
-    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
-    rm -rf CUDAMacOSXInstaller
+    7z x *-cuda_*_mac-dmg -o${temp}
+    cd ${temp}
+    tar -xzf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
     cd Developer/NVIDIA/CUDA-*/
 
     # toplevel
