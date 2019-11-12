@@ -48,6 +48,7 @@ before_script:
   - julia -e 'using Pkg; Pkg.instantiate()'
 
 script:
+  - cd CUDA
   - julia --color=yes build_tarballs.jl --verbose --version=$VERSION $TARGET
 
 deploy:
@@ -55,5 +56,5 @@ deploy:
   api_key:
     secure: "jzFLK0YgTjWVmPbDGjAHfn2++mfExXBsKDTwXrgJcuAnlvgATLDY/ERSPiOveiZ12lotzlWrc1MLN3ceByAl/W2o4kdTPcPVm/X08fsZCkhixBschI8R9/wsESgh227fJuBWUtDGn+insYzejlc197WwlpfNE+qlkDCC1OV5R8qFfXUiUPp1OjTARux/BOfRHcWgEbt7I/Jaki6EVTrUXj9u8OxCqRo1/lkpoaYYYdO2cPvT3vo6xZKXh/r6qzIxx8PMZn4O6GhgPqcw/8P+4/4n/9Q34HgyhB2RcI347XG1fIq6aJKxS4DpJThvG8TTkzhSv9UTnhOaA21gd97Q6xdkhse2Jkmg4ggwWFtQaGuOQOMpofF5c6xc3s32y8TMENCw73w99EIFVMzS0Ybi26rnrP+vsZiPWanKkdLKtyVCLY4LQND4LB3qFoob+5chcI4BeGbc0LQZnt8EC7oGWsoWmVUtdnQpMcKIdOdfS3pdcFZJED1SR2zLdy/bJZq6vzIbshs+UL8Xj/vBgoKENTrS8lFC3VCJpPH9L+gGhx6gTvY/KPGl7/JBfBxt/DVBhpftdGf/QOwebyfyqakUWBO4fsDsPivWk+1HJEmbdjyyyCbN8WyP9uhGQLyCDHrOXKImMJGFvfY5N9FNaVqEWWg88QHSdq/0rTDi46z6sWE="
   file_glob: true
-  file: products/*
+  file: CUDA/products/*
   skip_cleanup: true
