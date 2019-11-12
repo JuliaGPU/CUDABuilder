@@ -67,10 +67,13 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}/builds/cuda-toolkit
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv targets/x86_64-linux/lib ${prefix}
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -95,8 +98,12 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     cd ${temp}
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir -p ${prefix}/bin ${prefix}/lib
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
@@ -127,10 +134,13 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib ${prefix}
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -220,10 +230,13 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib64 ${prefix}/lib
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -247,8 +260,12 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     cd ${temp}
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir -p ${prefix}/bin ${prefix}/lib
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
@@ -279,10 +296,13 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib ${prefix}
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -372,10 +392,13 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib64 ${prefix}/lib
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -399,8 +422,12 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     cd ${temp}
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir -p ${prefix}/bin ${prefix}/lib
 
     # nested
     for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
@@ -430,10 +457,13 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib ${prefix}
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -523,10 +553,13 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib64 ${prefix}/lib
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
@@ -550,8 +583,12 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     cd ${temp}
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir -p ${prefix}/bin ${prefix}/lib
 
     # nested
     for project in compiler compiler/nvvm curand cusparse npp cufft cublas cudart \
@@ -581,10 +618,13 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # license
+    mkdir -p ${prefix}/share/licenses/CUDA
+    mv EULA.txt ${prefix}/share/licenses/CUDA/
+
     # toplevel
     mv bin ${prefix}
     mv lib ${prefix}
-    mkdir ${prefix}/share
 
     # nested
     for project in nvvm extras/CUPTI; do
