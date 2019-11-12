@@ -169,6 +169,7 @@ products = [
     LibraryProduct(["libcublas", "cublas", "cublas64_10"], :libcublas),
     LibraryProduct(["libcusolver", "cusolver", "cusolver64_10"], :libcusolver),
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_10"], :libcusparse),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
 if wants_version("10.1")
@@ -320,6 +321,7 @@ products = [
     LibraryProduct(["libcublas", "cublas", "cublas64_100"], :libcublas),
     LibraryProduct(["libcusolver", "cusolver", "cusolver64_100"], :libcusolver),
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_100"], :libcusparse),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
 if wants_version("10.0")
@@ -470,6 +472,7 @@ products = [
     LibraryProduct(["libcublas", "cublas", "cublas64_92"], :libcublas),
     LibraryProduct(["libcusolver", "cusolver", "cusolver64_92"], :libcusolver),
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_92"], :libcusparse),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
 if wants_version("9.2")
@@ -620,6 +623,7 @@ products = [
     LibraryProduct(["libcublas", "cublas", "cublas64_90"], :libcublas),
     LibraryProduct(["libcusolver", "cusolver", "cusolver64_90"], :libcusolver),
     LibraryProduct(["libcusparse", "cusparse", "cusparse64_90"], :libcusparse),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
 if wants_version("9.0")
