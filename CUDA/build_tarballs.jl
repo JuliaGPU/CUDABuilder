@@ -25,7 +25,8 @@ function extract_flag(flag, val = nothing)
     return (false, val)
 end
 _, requested_version = extract_flag("--version")
-wants_version(ver::String) = requested_version === nothing || requested_version == ver
+requested_version = VersionNumber(requested_version)
+wants_version(ver::VersionNumber) = requested_version === nothing || requested_version == ver
 
 # we really don't want to download all sources when only building a single target,
 # so make it possible to request so (this especially matters on Travis CI)
@@ -182,7 +183,7 @@ products = [
     FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
-if wants_version("10.1")
+if wants_version(v"10.1")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -344,7 +345,7 @@ products = [
     FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
-if wants_version("10.0")
+if wants_version(v"10.0")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -505,7 +506,7 @@ products = [
     FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
-if wants_version("9.2")
+if wants_version(v"9.2")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -666,7 +667,7 @@ products = [
     FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
 ]
 
-if wants_version("9.0")
+if wants_version(v"9.0")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
