@@ -50,7 +50,7 @@ fi
 """
 
 products = [
-    LibraryProduct(["libcudnn", "cudnn", "cudnn64_7"], :libcudnn),
+    LibraryProduct(["libcudnn", "cudnn64_7"], :libcudnn),
 ]
 
 
