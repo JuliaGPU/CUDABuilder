@@ -127,7 +127,7 @@ version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.
                         ("cuda$(cuda_version.major)$(cuda_version.minor)",))
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
 
 
 #
@@ -149,4 +149,4 @@ version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.
                         ("cuda$(cuda_version.major)$(cuda_version.minor)",))
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
