@@ -1,10 +1,12 @@
 SHELL:=/bin/bash
 
+TAG           := 0.1.3
+
 CUDA_VERSIONS := 9.0.176 9.2.148 10.0.130 10.1.243
 TARGETS       := x86_64-linux-gnu x86_64-apple-darwin14 x86_64-w64-mingw32
 
 EXT = tar.gz
-PRODUCTS := $(foreach VERSION,$(CUDA_VERSIONS),$(foreach TARGET,$(TARGETS),CUDA.v$(VERSION).$(TARGET).$(EXT)))
+PRODUCTS := $(foreach VERSION,$(CUDA_VERSIONS),$(foreach TARGET,$(TARGETS),CUDA.v$(VERSION)-$(TAG).$(TARGET).$(EXT)))
 
 .PHONY: all
 all: $(addprefix products/,$(PRODUCTS))
@@ -18,9 +20,9 @@ build:
 products/%.$(EXT): | build
 	BINARYBUILDER_AUTOMATIC_APPLE=true \
 	julia --project $(call word-dot,$*,1)/build_tarballs.jl \
-		  $(call word-dot,$*,5) \
+	      $(call word-dot,$*,7) \
 	      --version=$(call word-dot,$*,2).$(call word-dot,$*,3) \
-		  --verbose &> build/$*.log
+	      --verbose &> build/$*.log
 
 products/CUDA.%.$(EXT): CUDA/build_tarballs.jl
 

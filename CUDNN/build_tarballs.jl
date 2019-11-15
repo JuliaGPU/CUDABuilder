@@ -1,6 +1,7 @@
 using BinaryBuilder
 
 name = "CUDNN"
+tag = v"0.1.3"
 
 dependencies = []
 
@@ -73,8 +74,7 @@ sources_windows = [
     "5e4275d738cc3a105cf6558b70b8a2ff514989ca1cd17bc8515086e20561a652"
 ]
 
-version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.patch,
-                        ("cuda$(cuda_version.major)$(cuda_version.minor)",))
+version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
 build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
@@ -100,8 +100,7 @@ sources_windows = [
     "2767db23ae2cd869ac008235e2adab81430f951a92a62160884c80ab5902b9e8"
 ]
 
-version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.patch,
-                        ("cuda$(cuda_version.major)$(cuda_version.minor)",))
+version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
 build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
@@ -123,8 +122,7 @@ sources_windows = [
     "ffa553df2e9af1703bb7786a784356989dac5c415bf5bca73e52b1789ddd4984"
 ]
 
-version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.patch,
-                        ("cuda$(cuda_version.major)$(cuda_version.minor)",))
+version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
 build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
@@ -145,8 +143,7 @@ sources_windows = [
     "c7401514a6d7d24e8541f88c12e4328f165b5c5afd010ee462d356cac2158268"
 ]
 
-version = VersionNumber(cudnn_version.major, cudnn_version.minor, cudnn_version.patch,
-                        ("cuda$(cuda_version.major)$(cuda_version.minor)",))
+version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
 build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
 build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)

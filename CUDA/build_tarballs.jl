@@ -5,6 +5,7 @@ using BinaryBuilder
 # the resulting binaries, we reorganize everything using a flat bin/lib structure.
 
 name = "CUDA"
+tag = v"0.1.3"
 
 dependencies = []
 
@@ -39,7 +40,7 @@ wants_target(regex::Regex) = isempty(requested_targets) || any(target->occursin(
 # CUDA 10.1
 #
 
-version = v"10.1.243"
+cuda_version = v"10.1.243"
 
 sources_linux = [
     "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run" =>
@@ -184,6 +185,7 @@ products = [
 ]
 
 if wants_version(v"10.1")
+    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -200,7 +202,7 @@ end
 # CUDA 10.0
 #
 
-version = v"10.0.130"
+cuda_version = v"10.0.130"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux" =>
@@ -346,6 +348,7 @@ products = [
 ]
 
 if wants_version(v"10.0")
+    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -362,7 +365,7 @@ end
 # CUDA 9.2
 #
 
-version = v"9.2.148"
+cuda_version = v"9.2.148"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_396.37_linux" =>
@@ -507,6 +510,7 @@ products = [
 ]
 
 if wants_version(v"9.2")
+    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
@@ -523,7 +527,7 @@ end
 # CUDA 9.0
 #
 
-version = v"9.0.176"
+cuda_version = v"9.0.176"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run" =>
@@ -668,6 +672,7 @@ products = [
 ]
 
 if wants_version(v"9.0")
+    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
