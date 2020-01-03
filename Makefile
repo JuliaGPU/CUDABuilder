@@ -2,7 +2,7 @@ SHELL:=/bin/bash
 
 TAG           := 0.1.3
 
-CUDA_VERSIONS := 9.0.176 9.2.148 10.0.130 10.1.243
+CUDA_VERSIONS := 9.0.176 9.2.148 10.0.130 10.1.243 10.2.89
 TARGETS       := x86_64-linux-gnu x86_64-apple-darwin14 x86_64-w64-mingw32
 
 EXT = tar.gz

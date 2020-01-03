@@ -1,7 +1,7 @@
 using BinaryBuilder
 
 name = "CUDNN"
-tag = v"0.1.3"
+tag = v"0.1.4"
 
 dependencies = []
 
@@ -53,6 +53,27 @@ fi
 products = [
     LibraryProduct(["libcudnn", "cudnn64_7"], :libcudnn),
 ]
+
+
+#
+# CUDA 10.2
+#
+
+cuda_version = v"10.2"
+
+sources_linux = [
+    "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.2_20191118/cudnn-10.2-linux-x64-v7.6.5.32.tgz" =>
+    "600267f2caaed2fd58eb214ba669d8ea35f396a7d19b94822e6b36f9f7088c20"
+]
+sources_windows = [
+    "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.2_20191118/cudnn-10.2-windows10-x64-v7.6.5.32.zip" =>
+    "fba812f60c61bc33b81db06cd55e8d769774d036186571d724295c71c9936064"
+]
+
+version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+
+build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
+build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
 
 
 #
