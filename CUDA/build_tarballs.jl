@@ -3,9 +3,12 @@ using BinaryBuilder
 # CUDA is weirdly organized, with several tools in bin/lib directories, some in dedicated
 # subproject folders, and others in a catch-all extras/ directory. to simplify use of
 # the resulting binaries, we reorganize everything using a flat bin/lib structure.
+#
+# note that we only copy (select) files and libraries that we are allowed to redistribute
+# as per https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 
 name = "CUDA"
-tag = v"0.1.4"
+tag = v"0.2.0"
 
 dependencies = []
 
@@ -69,65 +72,113 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}/builds/cuda-toolkit
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mv targets/x86_64-linux/lib .
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv targets/x86_64-linux/lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.so* lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]]   && mv ${project}/bin/*   ${prefix}/bin
-        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.so* lib/libcufftw.so* ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c                                   # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
-    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/cuda-uninstaller
+    # CUDA BLAS Library
+    mv lib/libcublas.so* lib/libcublasLt.so* ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.so* ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.so* ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.so* ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.so* ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.so* ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.so* ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.so* ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10.exe -o${temp}
     cd ${temp}
+    7z x "CUDAVisualStudioIntegration/NVIDIA NVTX Installer.x86_64".*.msi -o${temp}/nvtx_installer
     find .
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib
+    # CUDA Runtime
+    mv cudart/bin/cudart64_*.dll ${prefix}/bin
+    mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
 
-    # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
-                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
-    done
-    mv nvcc/nvvm/libdevice ${prefix}/share
-    mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
+    # CUDA FFT Library
+    mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
 
-    # fixup
-    chmod +x ${prefix}/bin/*.exe
+    # CUDA BLAS Library
+    mv cublas/bin/cublas64_*.dll cublas/bin/cublasLt64_*.dll ${prefix}/bin
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
-    rm    ${prefix}/bin/nvcc.profile
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
-    rm    ${prefix}/bin/nvprof.exe                              # profiling
-    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
+    # NVIDIA "Drop-in" BLAS Library
+    mv cublas/bin/nvblas64_*.dll ${prefix}/bin
+
+    # CUDA Sparse Matrix Library
+    mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+
+    # CUDA Linear Solver Library
+    mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+
+    # CUDA Random Number Generation Library
+    mv curand/bin/curand64_*.dll ${prefix}/bin
+
+    # CUDA Accelerated Graph Library
+    mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+
+    # NVIDIA Performance Primitives Library
+    mv npp/bin/npp*64_*.dll ${prefix}/bin
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvcc/nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv cupti/extras/CUPTI/lib64/cupti64_*.dll ${prefix}/bin
+
+    # NVIDIA Tools Extension Library
+    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+
+    # CUDA Disassembler
+    mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
+    chmod +x ${prefix}/bin/nvdisasm.exe
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac.dmg 5.hfs -o${temp}
     cd ${temp}
@@ -136,49 +187,83 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    mv nvvm/lib/* ${prefix}/lib
-    mv nvvm/libdevice ${prefix}/share
-    mv extras/CUPTI/lib64/* ${prefix}/lib
+    # CUDA FFT Library
+    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cudafe++}            # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c                                   # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
-    rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/uninstall_cuda_*.pl
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+    # CUDA BLAS Library
+    mv lib/libcublas.*dylib lib/libcublasLt.*dylib ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.*dylib ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.*dylib ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.*dylib ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.*dylib ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.*dylib ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.*dylib ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.*dylib ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
 products = [
-    ExecutableProduct("nvdisasm", :nvdisasm),
-    ExecutableProduct("cuobjdump", :cuobjdump),
-    ExecutableProduct("fatbinary", :fatbinary),
-    ExecutableProduct("ptxas", :ptxas),
-    ExecutableProduct("nvprune", :nvprune),
-    ExecutableProduct("nvlink", :nvlink),
-    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
     LibraryProduct(["libcudart", "cudart64_102"], :libcudart),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
     LibraryProduct(["libcufft", "cufft64_10"], :libcufft),
     LibraryProduct(["libcufftw", "cufftw64_10"], :libcufftw),
-    LibraryProduct(["libcurand", "curand64_10"], :libcurand),
     LibraryProduct(["libcublas", "cublas64_10"], :libcublas),
-    LibraryProduct(["libcusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(["libcublasLt", "cublasLt64_10"], :libcublasLt),
+    LibraryProduct(["libnvblas", "nvblas64_10"], :libnvblas),
     LibraryProduct(["libcusparse", "cusparse64_10"], :libcusparse),
-    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
+    LibraryProduct(["libcusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(["libcurand", "curand64_10"], :libcurand),
+    LibraryProduct(["libnvgraph", "nvgraph64_10"], :libcurand),
+    LibraryProduct(["libnppc", "nppc64_10"], :libnppc),
+    LibraryProduct(["libnppial", "nppial64_10"], :libnppial),
+    LibraryProduct(["libnppicc", "nppicc64_10"], :libnppicc),
+    LibraryProduct(["libnppicom", "nppicom64_10"], :libnppicom),
+    LibraryProduct(["libnppidei", "nppidei64_10"], :libnppidei),
+    LibraryProduct(["libnppif", "nppif64_10"], :libnppif),
+    LibraryProduct(["libnppig", "nppig64_10"], :libnppig),
+    LibraryProduct(["libnppim", "nppim64_10"], :libnppim),
+    LibraryProduct(["libnppist", "nppist64_10"], :libnppist),
+    LibraryProduct(["libnppisu", "nppisu64_10"], :libnppisu),
+    LibraryProduct(["libnppitc", "nppitc64_10"], :libnppitc),
+    LibraryProduct(["libnpps", "npps64_10"], :libnpps),
+    LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
 ]
 
 if wants_version(v"10.2")
@@ -187,7 +272,8 @@ if wants_version(v"10.2")
         build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
     end
     if wants_target(r"x86_64-apple-darwin")
-        build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        # this version doesn't ship NVTX anymore, which we require
+        #build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
     end
     if wants_target("x86_64-w64-mingw32")
         build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
@@ -228,65 +314,113 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd ${temp}/builds/cuda-toolkit
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mv targets/x86_64-linux/lib .
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv targets/x86_64-linux/lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.so* lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]]   && mv ${project}/bin/*   ${prefix}/bin
-        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.so* lib/libcufftw.so* ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
-    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/cuda-uninstaller
+    # CUDA BLAS Library
+    mv lib/libcublas.so* lib/libcublasLt.so* ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.so* ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.so* ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.so* ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.so* ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.so* ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.so* ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.so* ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10.exe -o${temp}
     cd ${temp}
+    7z x "CUDAVisualStudioIntegration/NVIDIA NVTX Installer.x86_64".*.msi -o${temp}/nvtx_installer
     find .
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib
+    # CUDA Runtime
+    mv cudart/bin/cudart64_*.dll ${prefix}/bin
+    mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
 
-    # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
-                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
-    done
-    mv nvcc/nvvm/libdevice ${prefix}/share
-    mv cupti/extras/CUPTI/lib64/* ${prefix}/bin/
+    # CUDA FFT Library
+    mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
 
-    # fixup
-    chmod +x ${prefix}/bin/*.exe
+    # CUDA BLAS Library
+    mv cublas/bin/cublas64_*.dll cublas/bin/cublasLt64_*.dll ${prefix}/bin
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
-    rm    ${prefix}/bin/nvcc.profile
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
-    rm    ${prefix}/bin/nvprof.exe                              # profiling
-    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
+    # NVIDIA "Drop-in" BLAS Library
+    mv cublas/bin/nvblas64_*.dll ${prefix}/bin
+
+    # CUDA Sparse Matrix Library
+    mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+
+    # CUDA Linear Solver Library
+    mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+
+    # CUDA Random Number Generation Library
+    mv curand/bin/curand64_*.dll ${prefix}/bin
+
+    # CUDA Accelerated Graph Library
+    mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+
+    # NVIDIA Performance Primitives Library
+    mv npp/bin/npp*64_*.dll ${prefix}/bin
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvcc/nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv cupti/extras/CUPTI/lib64/cupti64_*.dll ${prefix}/bin
+
+    # NVIDIA Tools Extension Library
+    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+
+    # CUDA Disassembler
+    mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
+    chmod +x ${prefix}/bin/nvdisasm.exe
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac.dmg 5.hfs -o${temp}
     cd ${temp}
@@ -295,52 +429,86 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight,computeprof}        # profiling
-    rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/uninstall_cuda_*.pl
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+    # CUDA BLAS Library
+    mv lib/libcublas.*dylib lib/libcublasLt.*dylib ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.*dylib ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.*dylib ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.*dylib ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.*dylib ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.*dylib ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.*dylib ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.*dylib ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.*dylib ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
 products = [
-    ExecutableProduct("nvdisasm", :nvdisasm),
-    ExecutableProduct("cuobjdump", :cuobjdump),
-    ExecutableProduct("fatbinary", :fatbinary),
-    ExecutableProduct("ptxas", :ptxas),
-    ExecutableProduct("nvprune", :nvprune),
-    ExecutableProduct("nvlink", :nvlink),
-    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
     LibraryProduct(["libcudart", "cudart64_101"], :libcudart),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
     LibraryProduct(["libcufft", "cufft64_10"], :libcufft),
     LibraryProduct(["libcufftw", "cufftw64_10"], :libcufftw),
-    LibraryProduct(["libcurand", "curand64_10"], :libcurand),
     LibraryProduct(["libcublas", "cublas64_10"], :libcublas),
-    LibraryProduct(["libcusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(["libcublasLt", "cublasLt64_10"], :libcublasLt),
+    LibraryProduct(["libnvblas", "nvblas64_10"], :libnvblas),
     LibraryProduct(["libcusparse", "cusparse64_10"], :libcusparse),
-    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
+    LibraryProduct(["libcusolver", "cusolver64_10"], :libcusolver),
+    LibraryProduct(["libcurand", "curand64_10"], :libcurand),
+    LibraryProduct(["libnvgraph", "nvgraph64_10"], :libcurand),
+    LibraryProduct(["libnppc", "nppc64_10"], :libnppc),
+    LibraryProduct(["libnppial", "nppial64_10"], :libnppial),
+    LibraryProduct(["libnppicc", "nppicc64_10"], :libnppicc),
+    LibraryProduct(["libnppicom", "nppicom64_10"], :libnppicom),
+    LibraryProduct(["libnppidei", "nppidei64_10"], :libnppidei),
+    LibraryProduct(["libnppif", "nppif64_10"], :libnppif),
+    LibraryProduct(["libnppig", "nppig64_10"], :libnppig),
+    LibraryProduct(["libnppim", "nppim64_10"], :libnppim),
+    LibraryProduct(["libnppist", "nppist64_10"], :libnppist),
+    LibraryProduct(["libnppisu", "nppisu64_10"], :libnppisu),
+    LibraryProduct(["libnppitc", "nppitc64_10"], :libnppitc),
+    LibraryProduct(["libnpps", "npps64_10"], :libnpps),
+    LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
 ]
 
 if wants_version(v"10.1")
@@ -392,64 +560,112 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib64 ${prefix}/lib
+    # CUDA Runtime
+    mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib64/libcufft.so* lib64/libcufftw.so* ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    # CUDA BLAS Library
+    mv lib64/libcublas.so* ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib64/libnvblas.so* ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib64/libcusparse.so* ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib64/libcusolver.so* ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib64/libcurand.so* ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib64/libnvgraph.so* ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib64/libnpp*.so* ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib64/libnvToolsExt.so* ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10 -o${temp}
     cd ${temp}
+    7z x "CUDAVisualStudioIntegration/NVIDIA NVTX Installer.x86_64".*.msi -o${temp}/nvtx_installer
     find .
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib
+    # CUDA Runtime
+    mv cudart/bin/cudart64_*.dll ${prefix}/bin
+    mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
 
-    # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
-                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
-    done
-    mv nvcc/nvvm/libdevice ${prefix}/share
-    mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
+    # CUDA FFT Library
+    mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
 
-    # fixup
-    chmod +x ${prefix}/bin/*.exe
+    # CUDA BLAS Library
+    mv cublas/bin/cublas64_*.dll ${prefix}/bin
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
-    rm    ${prefix}/bin/nvcc.profile
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
-    rm    ${prefix}/bin/nvprof.exe                              # profiling
-    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
+    # NVIDIA "Drop-in" BLAS Library
+    mv cublas/bin/nvblas64_*.dll ${prefix}/bin
+
+    # CUDA Sparse Matrix Library
+    mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+
+    # CUDA Linear Solver Library
+    mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+
+    # CUDA Random Number Generation Library
+    mv curand/bin/curand64_*.dll ${prefix}/bin
+
+    # CUDA Accelerated Graph Library
+    mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+
+    # NVIDIA Performance Primitives Library
+    mv npp/bin/npp*64_*.dll ${prefix}/bin
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvcc/nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv cupti/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+
+    # NVIDIA Tools Extension Library
+    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+
+    # CUDA Disassembler
+    mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
+    chmod +x ${prefix}/bin/nvdisasm.exe
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac 5.hfs -o${temp}
     cd ${temp}
@@ -458,52 +674,85 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/uninstall_cuda_*.pl
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+    # CUDA BLAS Library
+    mv lib/libcublas.*dylib ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.*dylib ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.*dylib ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.*dylib ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.*dylib ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.*dylib ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.*dylib ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.*dylib ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
 products = [
-    ExecutableProduct("nvdisasm", :nvdisasm),
-    ExecutableProduct("cuobjdump", :cuobjdump),
-    ExecutableProduct("fatbinary", :fatbinary),
-    ExecutableProduct("ptxas", :ptxas),
-    ExecutableProduct("nvprune", :nvprune),
-    ExecutableProduct("nvlink", :nvlink),
-    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
     LibraryProduct(["libcudart", "cudart64_100"], :libcudart),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
     LibraryProduct(["libcufft", "cufft64_100"], :libcufft),
     LibraryProduct(["libcufftw", "cufftw64_100"], :libcufftw),
-    LibraryProduct(["libcurand", "curand64_100"], :libcurand),
     LibraryProduct(["libcublas", "cublas64_100"], :libcublas),
-    LibraryProduct(["libcusolver", "cusolver64_100"], :libcusolver),
+    LibraryProduct(["libnvblas", "nvblas64_100"], :libnvblas),
     LibraryProduct(["libcusparse", "cusparse64_100"], :libcusparse),
-    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
+    LibraryProduct(["libcusolver", "cusolver64_100"], :libcusolver),
+    LibraryProduct(["libcurand", "curand64_100"], :libcurand),
+    LibraryProduct(["libnvgraph", "nvgraph64_100"], :libcurand),
+    LibraryProduct(["libnppc", "nppc64_100"], :libnppc),
+    LibraryProduct(["libnppial", "nppial64_100"], :libnppial),
+    LibraryProduct(["libnppicc", "nppicc64_100"], :libnppicc),
+    LibraryProduct(["libnppicom", "nppicom64_100"], :libnppicom),
+    LibraryProduct(["libnppidei", "nppidei64_100"], :libnppidei),
+    LibraryProduct(["libnppif", "nppif64_100"], :libnppif),
+    LibraryProduct(["libnppig", "nppig64_100"], :libnppig),
+    LibraryProduct(["libnppim", "nppim64_100"], :libnppim),
+    LibraryProduct(["libnppist", "nppist64_100"], :libnppist),
+    LibraryProduct(["libnppisu", "nppisu64_100"], :libnppisu),
+    LibraryProduct(["libnppitc", "nppitc64_100"], :libnppitc),
+    LibraryProduct(["libnpps", "npps64_100"], :libnpps),
+    LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
 ]
 
 if wants_version(v"10.0")
@@ -555,64 +804,112 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib64 ${prefix}/lib
+    # CUDA Runtime
+    mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib64/libcufft.so* lib64/libcufftw.so* ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    # CUDA BLAS Library
+    mv lib64/libcublas.so* ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib64/libnvblas.so* ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib64/libcusparse.so* ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib64/libcusolver.so* ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib64/libcurand.so* ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib64/libnvgraph.so* ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib64/libnpp*.so* ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib64/libnvToolsExt.so* ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10 -o${temp}
     cd ${temp}
+    7z x "CUDAVisualStudioIntegration/NVIDIA NVTX Installer.x86_64".*.msi -o${temp}/nvtx_installer
     find .
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib
+    # CUDA Runtime
+    mv cudart/bin/cudart64_*.dll ${prefix}/bin
+    mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
 
-    # nested
-    for project in cuobjdump memcheck nvcc nvcc/nvvm nvdisasm curand cusparse npp cufft \
-                   cublas cudart cusolver nvrtc nvgraph nvprof nvprune; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
-    done
-    mv nvcc/nvvm/libdevice ${prefix}/share
-    mv cupti/extras/CUPTI/libx64/* ${prefix}/bin/
+    # CUDA FFT Library
+    mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
 
-    # fixup
-    chmod +x ${prefix}/bin/*.exe
+    # CUDA BLAS Library
+    mv cublas/bin/cublas64_*.dll ${prefix}/bin
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
-    rm    ${prefix}/bin/nvcc.profile
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
-    rm    ${prefix}/bin/nvprof.exe                              # profiling
-    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
+    # NVIDIA "Drop-in" BLAS Library
+    mv cublas/bin/nvblas64_*.dll ${prefix}/bin
+
+    # CUDA Sparse Matrix Library
+    mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+
+    # CUDA Linear Solver Library
+    mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+
+    # CUDA Random Number Generation Library
+    mv curand/bin/curand64_*.dll ${prefix}/bin
+
+    # CUDA Accelerated Graph Library
+    mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+
+    # NVIDIA Performance Primitives Library
+    mv npp/bin/npp*64_*.dll ${prefix}/bin
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvcc/nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv cupti/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+
+    # NVIDIA Tools Extension Library
+    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+
+    # CUDA Disassembler
+    mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
+    chmod +x ${prefix}/bin/nvdisasm.exe
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac -o${temp}
     cd ${temp}
@@ -620,52 +917,85 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/uninstall_cuda_*.pl
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+    # CUDA BLAS Library
+    mv lib/libcublas.*dylib ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.*dylib ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.*dylib ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.*dylib ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.*dylib ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.*dylib ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.*dylib ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.*dylib ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
 products = [
-    ExecutableProduct("nvdisasm", :nvdisasm),
-    ExecutableProduct("cuobjdump", :cuobjdump),
-    ExecutableProduct("fatbinary", :fatbinary),
-    ExecutableProduct("ptxas", :ptxas),
-    ExecutableProduct("nvprune", :nvprune),
-    ExecutableProduct("nvlink", :nvlink),
-    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
     LibraryProduct(["libcudart", "cudart64_92"], :libcudart),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
     LibraryProduct(["libcufft", "cufft64_92"], :libcufft),
     LibraryProduct(["libcufftw", "cufftw64_92"], :libcufftw),
-    LibraryProduct(["libcurand", "curand64_92"], :libcurand),
     LibraryProduct(["libcublas", "cublas64_92"], :libcublas),
-    LibraryProduct(["libcusolver", "cusolver64_92"], :libcusolver),
+    LibraryProduct(["libnvblas", "nvblas64_92"], :libnvblas),
     LibraryProduct(["libcusparse", "cusparse64_92"], :libcusparse),
-    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
+    LibraryProduct(["libcusolver", "cusolver64_92"], :libcusolver),
+    LibraryProduct(["libcurand", "curand64_92"], :libcurand),
+    LibraryProduct(["libnvgraph", "nvgraph64_92"], :libcurand),
+    LibraryProduct(["libnppc", "nppc64_92"], :libnppc),
+    LibraryProduct(["libnppial", "nppial64_92"], :libnppial),
+    LibraryProduct(["libnppicc", "nppicc64_92"], :libnppicc),
+    LibraryProduct(["libnppicom", "nppicom64_92"], :libnppicom),
+    LibraryProduct(["libnppidei", "nppidei64_92"], :libnppidei),
+    LibraryProduct(["libnppif", "nppif64_92"], :libnppif),
+    LibraryProduct(["libnppig", "nppig64_92"], :libnppig),
+    LibraryProduct(["libnppim", "nppim64_92"], :libnppim),
+    LibraryProduct(["libnppist", "nppist64_92"], :libnppist),
+    LibraryProduct(["libnppisu", "nppisu64_92"], :libnppisu),
+    LibraryProduct(["libnppitc", "nppitc64_92"], :libnppitc),
+    LibraryProduct(["libnpps", "npps64_92"], :libnpps),
+    LibraryProduct(["libnvvm", "nvvm64_32_0"], :libnvvm),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
 ]
 
 if wants_version(v"9.2")
@@ -717,64 +1047,112 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     cd pkg
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib64 ${prefix}/lib
+    # CUDA Runtime
+    mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib64 ]] && mv ${project}/lib64/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib64/libcufft.so* lib64/libcufftw.so* ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/{cuda-memcheck,cuda-gdb,cuda-gdbserver} # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
+    # CUDA BLAS Library
+    mv lib64/libcublas.so* ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib64/libnvblas.so* ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib64/libcusparse.so* ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib64/libcusolver.so* ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib64/libcurand.so* ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib64/libnvgraph.so* ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib64/libnpp*.so* ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib64/libnvToolsExt.so* ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     7z x *-cuda_*_win10-exe -o${temp}
     cd ${temp}
+    7z x "CUDAVisualStudioIntegration/NVIDIA NVTX Installer.x86_64".*.msi -o${temp}/nvtx_installer
     find .
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mkdir -p ${prefix}/bin ${prefix}/lib
+    # CUDA Runtime
+    mv cudart/bin/cudart64_*.dll ${prefix}/bin
+    mv compiler/lib/x64/cudadevrt.lib ${prefix}/lib
 
-    # nested
-    for project in compiler compiler/nvvm curand cusparse npp cufft cublas cudart \
-                   cusolver nvrtc nvgraph command_line_tools; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib/x64 ]] && mv ${project}/lib/x64/* ${prefix}/lib
-    done
-    mv compiler/nvvm/libdevice ${prefix}/share
-    mv command_line_tools/extras/CUPTI/libx64/* ${prefix}/bin/
+    # CUDA FFT Library
+    mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
 
-    # fixup
-    chmod +x ${prefix}/bin/*.exe
+    # CUDA BLAS Library
+    mv cublas/bin/cublas64_*.dll ${prefix}/bin
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,cicc,cudafe++}.exe   # CUDA C/C++ compiler
-    rm    ${prefix}/bin/nvcc.profile
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/bin2c.exe                               # C/C++ utilities
-    rm    ${prefix}/bin/nvprof.exe                              # profiling
-    rm    ${prefix}/bin/cuda-memcheck.exe                       # debugging
-    rm    ${prefix}/lib/*_static*.lib                           # we can't link statically
+    # NVIDIA "Drop-in" BLAS Library
+    mv cublas/bin/nvblas64_*.dll ${prefix}/bin
+
+    # CUDA Sparse Matrix Library
+    mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+
+    # CUDA Linear Solver Library
+    mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+
+    # CUDA Random Number Generation Library
+    mv curand/bin/curand64_*.dll ${prefix}/bin
+
+    # CUDA Accelerated Graph Library
+    mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+
+    # NVIDIA Performance Primitives Library
+    mv npp/bin/npp*64_*.dll ${prefix}/bin
+
+    # NVIDIA Optimizing Compiler Library
+    mv compiler/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv compiler/nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv command_line_tools/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+
+    # NVIDIA Tools Extension Library
+    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+
+    # CUDA Disassembler
+    mv compiler/bin/nvdisasm.exe ${prefix}/bin
+    chmod +x ${prefix}/bin/nvdisasm.exe
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     7z x *-cuda_*_mac-dmg -o${temp}
     cd ${temp}
@@ -782,52 +1160,85 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd Developer/NVIDIA/CUDA-*/
     find .
 
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDA Runtime
+    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
 
-    # nested
-    for project in nvvm extras/CUPTI; do
-        [[ -d ${project} ]] || { echo "${project} does not exist!"; exit 1; }
-        [[ -d ${project}/bin ]] && mv ${project}/bin/* ${prefix}/bin
-        [[ -d ${project}/lib ]] && mv ${project}/lib/* ${prefix}/lib
-    done
-    mv nvvm/libdevice ${prefix}/share
+    # CUDA FFT Library
+    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
 
-    # clean up
-    rm    ${prefix}/bin/{nvcc,nvcc.profile,cicc,cudafe++}       # CUDA C/C++ compiler
-    rm -r ${prefix}/bin/crt/
-    rm    ${prefix}/bin/{gpu-library-advisor,bin2c}             # C/C++ utilities
-    rm    ${prefix}/bin/{nvprof,nvvp,nsight}                    # profiling
-    rm    ${prefix}/bin/cuda-memcheck                           # debugging
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
-    rm -r ${prefix}/lib/stubs/                                  # stubs are a C/C++ thing
-    rm    ${prefix}/bin/uninstall_cuda_*.pl
-    rm    ${prefix}/bin/nsight_ee_plugins_manage.sh
-    rm    ${prefix}/bin/.cuda_toolkit_uninstall_manifest_do_not_delete.txt
+    # CUDA BLAS Library
+    mv lib/libcublas.*dylib ${prefix}/lib
+
+    # NVIDIA "Drop-in" BLAS Library
+    mv lib/libnvblas.*dylib ${prefix}/lib
+
+    # CUDA Sparse Matrix Library
+    mv lib/libcusparse.*dylib ${prefix}/lib
+
+    # CUDA Linear Solver Library
+    mv lib/libcusolver.*dylib ${prefix}/lib
+
+    # CUDA Random Number Generation Library
+    mv lib/libcurand.*dylib ${prefix}/lib
+
+    # CUDA Accelerated Graph Library
+    mv lib/libnvgraph.*dylib ${prefix}/lib
+
+    # NVIDIA Performance Primitives Library
+    mv lib/libnpp*.*dylib ${prefix}/lib
+
+    # NVIDIA Optimizing Compiler Library
+    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+
+    # NVIDIA Common Device Math Functions Library
+    mkdir ${prefix}/share/libdevice
+    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
+
+    # CUDA Profiling Tools Interface (CUPTI) Library
+    mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+
+    # NVIDIA Tools Extension Library
+    mv lib/libnvToolsExt.*dylib ${prefix}/lib
+
+    # CUDA Disassembler
+    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
 products = [
-    ExecutableProduct("nvdisasm", :nvdisasm),
-    ExecutableProduct("cuobjdump", :cuobjdump),
-    ExecutableProduct("fatbinary", :fatbinary),
-    ExecutableProduct("ptxas", :ptxas),
-    ExecutableProduct("nvprune", :nvprune),
-    ExecutableProduct("nvlink", :nvlink),
-    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
     LibraryProduct(["libcudart", "cudart64_90"], :libcudart),
+    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
     LibraryProduct(["libcufft", "cufft64_90"], :libcufft),
     LibraryProduct(["libcufftw", "cufftw64_90"], :libcufftw),
-    LibraryProduct(["libcurand", "curand64_90"], :libcurand),
     LibraryProduct(["libcublas", "cublas64_90"], :libcublas),
-    LibraryProduct(["libcusolver", "cusolver64_90"], :libcusolver),
+    LibraryProduct(["libnvblas", "nvblas64_90"], :libnvblas),
     LibraryProduct(["libcusparse", "cusparse64_90"], :libcusparse),
-    FileProduct(["lib/libcudadevrt.a", "lib/cudadevrt.lib"], :libcudadevrt),
+    LibraryProduct(["libcusolver", "cusolver64_90"], :libcusolver),
+    LibraryProduct(["libcurand", "curand64_90"], :libcurand),
+    LibraryProduct(["libnvgraph", "nvgraph64_90"], :libcurand),
+    LibraryProduct(["libnppc", "nppc64_90"], :libnppc),
+    LibraryProduct(["libnppial", "nppial64_90"], :libnppial),
+    LibraryProduct(["libnppicc", "nppicc64_90"], :libnppicc),
+    LibraryProduct(["libnppicom", "nppicom64_90"], :libnppicom),
+    LibraryProduct(["libnppidei", "nppidei64_90"], :libnppidei),
+    LibraryProduct(["libnppif", "nppif64_90"], :libnppif),
+    LibraryProduct(["libnppig", "nppig64_90"], :libnppig),
+    LibraryProduct(["libnppim", "nppim64_90"], :libnppim),
+    LibraryProduct(["libnppist", "nppist64_90"], :libnppist),
+    LibraryProduct(["libnppisu", "nppisu64_90"], :libnppisu),
+    LibraryProduct(["libnppitc", "nppitc64_90"], :libnppitc),
+    LibraryProduct(["libnpps", "npps64_90"], :libnpps),
+    LibraryProduct(["libnvvm", "nvvm64_32_0"], :libnvvm),
+    FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
+    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
 ]
 
 if wants_version(v"9.0")
