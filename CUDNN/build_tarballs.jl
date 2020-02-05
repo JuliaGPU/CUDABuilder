@@ -5,6 +5,8 @@ tag = v"0.1.4"
 
 dependencies = []
 
+output = Dict()
+
 cudnn_version = v"7.6.5"
 
 script = raw"""
@@ -60,6 +62,7 @@ products = [
 #
 
 cuda_version = v"10.2"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.2_20191118/cudnn-10.2-linux-x64-v7.6.5.32.tgz" =>
@@ -72,8 +75,8 @@ sources_windows = [
 
 version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
-build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -81,6 +84,7 @@ build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)],
 #
 
 cuda_version = v"10.1"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.1_20191031/cudnn-10.1-linux-x64-v7.6.5.32.tgz" =>
@@ -97,9 +101,9 @@ sources_windows = [
 
 version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
-build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -107,6 +111,7 @@ build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)],
 #
 
 cuda_version = v"10.0"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.0_20191031/cudnn-10.0-linux-x64-v7.6.5.32.tgz" =>
@@ -123,9 +128,9 @@ sources_windows = [
 
 version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
-build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -133,6 +138,7 @@ build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)],
 #
 
 cuda_version = v"9.2"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/9.2_20191031/cudnn-9.2-linux-x64-v7.6.5.32.tgz" =>
@@ -145,8 +151,8 @@ sources_windows = [
 
 version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
-build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -154,6 +160,7 @@ build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)],
 #
 
 cuda_version = v"9.0"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/9.0_20191031/cudnn-9.0-linux-x64-v7.6.5.32.tgz" =>
@@ -166,5 +173,29 @@ sources_windows = [
 
 version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
 
-build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+
+
+#
+# Generate artifact
+#
+
+using Pkg
+using Pkg.Artifacts
+
+bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/$(tag)"
+artifacts_toml = joinpath(@__DIR__, "Artifacts.toml")
+
+for cuda_version in keys(output)
+    src_name = "CUDNN-CUDA$(cuda_version.major).$(cuda_version.minor)"
+
+    for platform in keys(output[cuda_version])
+        tarball_name, tarball_hash, git_hash, products_info = output[cuda_version][platform]
+
+        download_info = Tuple[
+            (joinpath(bin_path, basename(tarball_name)), tarball_hash),
+        ]
+        bind_artifact!(artifacts_toml, src_name, git_hash; platform=platform, download_info=download_info, force=true, lazy=true)
+    end
+end

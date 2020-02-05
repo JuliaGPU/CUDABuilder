@@ -12,6 +12,8 @@ tag = v"0.2.0"
 
 dependencies = []
 
+output = Dict()
+
 # since this is a multi-version builder, make it possible to specify which version to build
 function extract_flag(flag, val = nothing)
     for f in ARGS
@@ -44,14 +46,14 @@ wants_target(regex::Regex) = isempty(requested_targets) || any(target->occursin(
 #
 
 cuda_version = v"10.2.89"
+output[cuda_version] = Dict()
+
+# NOTE: although 10.2 is supposed to be the last version supporting macOS,
+#       it doesn't ship NVTX or CUDNN anymore, so we don't bother.
 
 sources_linux = [
     "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run" =>
     "560d07fdcf4a46717f2242948cd4f92c5f9b6fc7eae10dd996614da913d5ca11"
-]
-sources_macos = [
-    "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_mac.dmg" =>
-    "51193fff427aad0a3a15223b1a202a6c6f0964fcc6fb0e6c77ca7cd5b6944d20"
 ]
 sources_windows = [
     "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_win10.exe" =>
@@ -179,60 +181,6 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Disassembler
     mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
     chmod +x ${prefix}/bin/nvdisasm.exe
-elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    7z x *-cuda_*_mac.dmg 5.hfs -o${temp}
-    cd ${temp}
-    7z x 5.hfs
-    tar -zxf CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/Resources/payload/cuda_mac_installer_tk.tar.gz
-    cd Developer/NVIDIA/CUDA-*/
-    find .
-
-    # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
-
-    # license
-    mkdir -p ${prefix}/share/licenses/CUDA
-    mv EULA.txt ${prefix}/share/licenses/CUDA/
-
-    # CUDA Runtime
-    mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
-
-    # CUDA FFT Library
-    mv lib/libcufft.*dylib lib/libcufftw.*dylib ${prefix}/lib
-
-    # CUDA BLAS Library
-    mv lib/libcublas.*dylib lib/libcublasLt.*dylib ${prefix}/lib
-
-    # NVIDIA "Drop-in" BLAS Library
-    mv lib/libnvblas.*dylib ${prefix}/lib
-
-    # CUDA Sparse Matrix Library
-    mv lib/libcusparse.*dylib ${prefix}/lib
-
-    # CUDA Linear Solver Library
-    mv lib/libcusolver.*dylib ${prefix}/lib
-
-    # CUDA Random Number Generation Library
-    mv lib/libcurand.*dylib ${prefix}/lib
-
-    # CUDA Accelerated Graph Library
-    mv lib/libnvgraph.*dylib ${prefix}/lib
-
-    # NVIDIA Performance Primitives Library
-    mv lib/libnpp*.*dylib ${prefix}/lib
-
-    # NVIDIA Optimizing Compiler Library
-    mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
-
-    # NVIDIA Common Device Math Functions Library
-    mkdir ${prefix}/share/libdevice
-    mv nvvm/libdevice/libdevice.10.bc ${prefix}/share/libdevice
-
-    # CUDA Profiling Tools Interface (CUPTI) Library
-    mv extras/CUPTI/lib64/libcupti.*dylib ${prefix}/lib
-
-    # CUDA Disassembler
-    mv bin/nvdisasm ${prefix}/bin
 fi
 """
 
@@ -269,14 +217,10 @@ products = [
 if wants_version(v"10.2")
     version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
-    end
-    if wants_target(r"x86_64-apple-darwin")
-        # this version doesn't ship NVTX anymore, which we require
-        #build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -286,6 +230,7 @@ end
 #
 
 cuda_version = v"10.1.243"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run" =>
@@ -514,13 +459,13 @@ products = [
 if wants_version(v"10.1")
     version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -530,6 +475,7 @@ end
 #
 
 cuda_version = v"10.0.130"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux" =>
@@ -758,13 +704,13 @@ products = [
 if wants_version(v"10.0")
     version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -774,6 +720,7 @@ end
 #
 
 cuda_version = v"9.2.148"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_396.37_linux" =>
@@ -1001,13 +948,13 @@ products = [
 if wants_version(v"9.2")
     version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -1017,6 +964,7 @@ end
 #
 
 cuda_version = v"9.0.176"
+output[cuda_version] = Dict()
 
 sources_linux = [
     "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run" =>
@@ -1244,12 +1192,36 @@ products = [
 if wants_version(v"9.0")
     version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies)
+        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+    end
+end
+
+
+#
+# Generate artifact
+#
+
+using Pkg
+using Pkg.Artifacts
+
+bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/$(tag)"
+artifacts_toml = joinpath(@__DIR__, "Artifacts.toml")
+
+for cuda_version in keys(output)
+    src_name = "CUDA$(cuda_version.major).$(cuda_version.minor)"
+
+    for platform in keys(output[cuda_version])
+        tarball_name, tarball_hash, git_hash, products_info = output[cuda_version][platform]
+
+        download_info = Tuple[
+            (joinpath(bin_path, basename(tarball_name)), tarball_hash),
+        ]
+        bind_artifact!(artifacts_toml, src_name, git_hash; platform=platform, download_info=download_info, force=true, lazy=true)
     end
 end
