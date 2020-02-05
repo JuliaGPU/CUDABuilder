@@ -3,13 +3,13 @@
 using BinaryBuilder
 import SHA: sha256
 
-const tag = v"0.1.3"
+const tag = v"0.1.4"
 const bin_prefix = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v$tag"
 
 const platforms = [Linux(:x86_64, libc=:glibc) => "x86_64-linux-gnu",
                    Windows(:x86_64)            => "x86_64-w64-mingw32",
                    MacOS(:x86_64)              => "x86_64-apple-darwin14"]
-const cuda_versions = [v"10.1.243", v"10.0.130", v"9.2.148", v"9.0.176"]
+const cuda_versions = [v"10.2.89", v"10.1.243", v"10.0.130", v"9.2.148", v"9.0.176"]
 const cudnn_version = v"7.6.5"
 
 function filehash(path)
