@@ -215,12 +215,11 @@ products = [
 ]
 
 if wants_version(v"10.2")
-    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -457,15 +456,14 @@ products = [
 ]
 
 if wants_version(v"10.1")
-    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -702,15 +700,14 @@ products = [
 ]
 
 if wants_version(v"10.0")
-    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -946,15 +943,14 @@ products = [
 ]
 
 if wants_version(v"9.2")
-    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 
@@ -1190,15 +1186,14 @@ products = [
 ]
 
 if wants_version(v"9.0")
-    version = VersionNumber("$(cuda_version)-$(tag)")
     if wants_target("x86_64-linux-gnu")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
     end
     if wants_target(r"x86_64-apple-darwin")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
     end
     if wants_target("x86_64-w64-mingw32")
-        merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+        merge!(output[cuda_version], build_tarballs(ARGS, name, cuda_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
     end
 end
 

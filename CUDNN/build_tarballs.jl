@@ -73,7 +73,7 @@ sources_windows = [
     "fba812f60c61bc33b81db06cd55e8d769774d036186571d724295c71c9936064"
 ]
 
-version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
 
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
@@ -99,7 +99,7 @@ sources_windows = [
     "5e4275d738cc3a105cf6558b70b8a2ff514989ca1cd17bc8515086e20561a652"
 ]
 
-version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
 
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
@@ -126,7 +126,7 @@ sources_windows = [
     "2767db23ae2cd869ac008235e2adab81430f951a92a62160884c80ab5902b9e8"
 ]
 
-version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
 
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
@@ -149,7 +149,7 @@ sources_windows = [
     "ffa553df2e9af1703bb7786a784356989dac5c415bf5bca73e52b1789ddd4984"
 ]
 
-version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
 
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
@@ -171,7 +171,7 @@ sources_windows = [
     "c7401514a6d7d24e8541f88c12e4328f165b5c5afd010ee462d356cac2158268"
 ]
 
-version = VersionNumber("$(cudnn_version)-CUDA$(cuda_version.major).$(cuda_version.minor)-$(tag)")
+version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
 
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
@@ -188,7 +188,7 @@ bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/$(tag)"
 artifacts_toml = joinpath(@__DIR__, "Artifacts.toml")
 
 for cuda_version in keys(output)
-    src_name = "CUDNN-CUDA$(cuda_version.major).$(cuda_version.minor)"
+    src_name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
     for platform in keys(output[cuda_version])
         tarball_name, tarball_hash, git_hash, products_info = output[cuda_version][platform]
