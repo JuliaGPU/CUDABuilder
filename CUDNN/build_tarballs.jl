@@ -1,7 +1,7 @@
 using BinaryBuilder
 
 name = "CUDNN"
-tag = v"0.1.4"
+tag = v"0.2.0"
 
 dependencies = []
 
@@ -13,42 +13,41 @@ script = raw"""
 cd ${WORKSPACE}/srcdir
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
-    find .
     cd cuda
+
+    # prepare
+    mkdir ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
     mv NVIDIA_SLA_cuDNN_Support.txt ${prefix}/share/licenses/CUDNN/
 
-    # toplevel
-    mv lib64 ${prefix}/lib
-
-    # clean up
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
+    # CUDNN Library
+    mv lib64/libcudnn.so* ${prefix}/lib
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
-    find .
     cd cuda
+
+    # prepare
+    mkdir ${prefix}/bin ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
     mv NVIDIA_SLA_cuDNN_Support.txt ${prefix}/share/licenses/CUDNN/
 
-    # toplevel
-    mv bin ${prefix}
-    mv lib ${prefix}
+    # CUDNN Library
+    mv bin/cudnn64_*.dll ${prefix}/bin
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
-    find .
     cd cuda
+
+    # prepare
+    mkdir ${prefix}/lib ${prefix}/share
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
     mv NVIDIA_SLA_cuDNN_Support.txt ${prefix}/share/licenses/CUDNN/
 
-    # toplevel
-    mv lib ${prefix}
-
-    # clean up
-    rm    ${prefix}/lib/*_static*.a                             # we can't link statically
+    # CUDNN Library
+    mv lib/libcudnn.*dylib ${prefix}/lib
 fi
 """
 
