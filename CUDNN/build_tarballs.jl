@@ -183,7 +183,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows
 using Pkg
 using Pkg.Artifacts
 
-bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/$(tag)"
+bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v$(tag)"
 artifacts_toml = joinpath(@__DIR__, "Artifacts.toml")
 
 for cuda_version in keys(output)

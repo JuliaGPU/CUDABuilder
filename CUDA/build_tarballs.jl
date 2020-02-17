@@ -210,8 +210,9 @@ products = [
     LibraryProduct(["libnpps", "npps64_10"], :libnpps),
     LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
     FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
-    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libcupti", "cupti64_102"], :libcupti),
     LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
+    ExecutableProduct("nvdisasm", :nvdisasm),
 ]
 
 if wants_version(v"10.2")
@@ -451,8 +452,9 @@ products = [
     LibraryProduct(["libnpps", "npps64_10"], :libnpps),
     LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
     FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
-    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libcupti", "cupti64_101"], :libcupti),
     LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
+    ExecutableProduct("nvdisasm", :nvdisasm),
 ]
 
 if wants_version(v"10.1")
@@ -695,8 +697,9 @@ products = [
     LibraryProduct(["libnpps", "npps64_100"], :libnpps),
     LibraryProduct(["libnvvm", "nvvm64_33_0"], :libnvvm),
     FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
-    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libcupti", "cupti64_100"], :libcupti),
     LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
+    ExecutableProduct("nvdisasm", :nvdisasm),
 ]
 
 if wants_version(v"10.0")
@@ -938,8 +941,9 @@ products = [
     LibraryProduct(["libnpps", "npps64_92"], :libnpps),
     LibraryProduct(["libnvvm", "nvvm64_32_0"], :libnvvm),
     FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
-    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libcupti", "cupti64_92"], :libcupti),
     LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
+    ExecutableProduct("nvdisasm", :nvdisasm),
 ]
 
 if wants_version(v"9.2")
@@ -1181,8 +1185,9 @@ products = [
     LibraryProduct(["libnpps", "npps64_90"], :libnpps),
     LibraryProduct(["libnvvm", "nvvm64_32_0"], :libnvvm),
     FileProduct("share/libdevice/libdevice.10.bc", :libdevice),
-    ExecutableProduct("nvdisasm", :nvdisasm),
+    LibraryProduct(["libcupti", "cupti64_90"], :libcupti),
     LibraryProduct(["libnvToolsExt", "nvToolsExt64_1"], :libnvtoolsext),
+    ExecutableProduct("nvdisasm", :nvdisasm),
 ]
 
 if wants_version(v"9.0")
@@ -1205,7 +1210,7 @@ end
 using Pkg
 using Pkg.Artifacts
 
-bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/$(tag)"
+bin_path = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v$(tag)"
 artifacts_toml = joinpath(@__DIR__, "Artifacts.toml")
 
 for cuda_version in keys(output)
