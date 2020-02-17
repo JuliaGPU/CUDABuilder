@@ -43,4 +43,9 @@ cudnn="julia --project CUDNN/build_tarballs.jl"
 $cudnn                                   &>build/cudnn.log            &
 
 
+cutensor="julia --project CUTENSOR/build_tarballs.jl"
+
+$cutensor                                &>build/cutensor.log         &
+
+
 wait
