@@ -1,0 +1,135 @@
+[["CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "780a6189839aaee7fbbbd01c7c92ad326a45ba4b"
+lazy = true
+os = "macos"
+
+    [["CUDA10.0".download]]
+    sha256 = "c24d17f7b5459f68ff15f512801159a56de13b020f8c873f846cfe7cb47777b9"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.0.130.x86_64-apple-darwin14.tar.gz"
+[["CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "099a4eae9085de3e1e3d1b6a0bdc298ec7f5a4e5"
+lazy = true
+os = "windows"
+
+    [["CUDA10.0".download]]
+    sha256 = "ddbfb5e75dd1fe22ce680d258f17264858a0ab47ed536e26dcf1896ddf61ca1b"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.0.130.x86_64-w64-mingw32.tar.gz"
+[["CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "06e2f055357be0c49c57fa31f288b5968000e37f"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDA10.0".download]]
+    sha256 = "c67cea51a5a5dd08b651abe7713453baea2415e339f28efdd0842ab25259a126"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.0.130.x86_64-linux-gnu.tar.gz"
+
+[["CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "f22dc67f44ca2a1d648b82a63cad00714e238d95"
+lazy = true
+os = "macos"
+
+    [["CUDA10.1".download]]
+    sha256 = "d8fb022837f0333be9999a4eab4338443d3408796583966111f91fdffc5c91b8"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.1.243.x86_64-apple-darwin14.tar.gz"
+[["CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "53edb3327f1e64b2c280738579c6de5502e95223"
+lazy = true
+os = "windows"
+
+    [["CUDA10.1".download]]
+    sha256 = "70bb0ad21d13c051dd9168a812068b5ece2487c3419710dd10d84dd1aa5d48a7"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.1.243.x86_64-w64-mingw32.tar.gz"
+[["CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "94004363f1b7a1ec4464d39ebcb86043c8444a4f"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDA10.1".download]]
+    sha256 = "1670dd59e6a6435278e5343e76d0b77f50c6022e144bd73327451d0bed16a241"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.1.243.x86_64-linux-gnu.tar.gz"
+
+[["CUDA10.2"]]
+arch = "x86_64"
+git-tree-sha1 = "e12c3e3e8913697801e3cdc0c048b59a9a6cf3c4"
+lazy = true
+os = "windows"
+
+    [["CUDA10.2".download]]
+    sha256 = "f0cb6c4cd15dc7ce9803f9373789048f2e8b3cf85e4d6dab4d8139343b8e4a58"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.2.89.x86_64-w64-mingw32.tar.gz"
+[["CUDA10.2"]]
+arch = "x86_64"
+git-tree-sha1 = "3ca5dc32e817afc847e27ea736c9216ad65236c0"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDA10.2".download]]
+    sha256 = "09d568e68e0e1acd40580b08aa4ac0c429c953987afadacbbd9aba46875ff7a0"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v10.2.89.x86_64-linux-gnu.tar.gz"
+
+[["CUDA9.0"]]
+arch = "x86_64"
+git-tree-sha1 = "161d6468d3f6ad9a017c17cabbf5f1eff36c7413"
+lazy = true
+os = "windows"
+
+    [["CUDA9.0".download]]
+    sha256 = "6511947e07489b101b5c00d2d349ad74929a2f4f41ba8be527306d0202548849"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/0.2.0/CUDA.v9.0.176.x86_64-w64-mingw32.tar.gz"
+[["CUDA9.0"]]
+arch = "x86_64"
+git-tree-sha1 = "e4cb623ace964bc265cdf0bf8747a3d024746948"
+lazy = true
+os = "macos"
+
+    [["CUDA9.0".download]]
+    sha256 = "3edac84aa62ed5deda153aff8ba054e7cbab2e9492387ddc71e63a6f661fa011"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v9.0.176.x86_64-apple-darwin14.tar.gz"
+[["CUDA9.0"]]
+arch = "x86_64"
+git-tree-sha1 = "fc4275c92bd0b6af25e0e4f2b561853000fd97f7"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDA9.0".download]]
+    sha256 = "e4141ec617e59a00d036408873065246b587afaa418eef984987257b15d4e790"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v9.0.176.x86_64-linux-gnu.tar.gz"
+
+[["CUDA9.2"]]
+arch = "x86_64"
+git-tree-sha1 = "8357dbc266deb890047cefdb53953a11dda0ae9f"
+lazy = true
+os = "macos"
+
+    [["CUDA9.2".download]]
+    sha256 = "3a1c2dc7a738103634e6ed34fcbe591a7a77ba6f9f9eaa970ab222cf934cb094"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v9.2.148.x86_64-apple-darwin14.tar.gz"
+[["CUDA9.2"]]
+arch = "x86_64"
+git-tree-sha1 = "56d7cde57e70584352c9739314f120cbf57c219f"
+lazy = true
+os = "windows"
+
+    [["CUDA9.2".download]]
+    sha256 = "ebd4fd97140308cda57de79b0ffdbed134020717bfa0a323a4fa04dc3e252591"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v9.2.148.x86_64-w64-mingw32.tar.gz"
+[["CUDA9.2"]]
+arch = "x86_64"
+git-tree-sha1 = "5a44259a847611338eb5b2cc1fd88a856ca03d79"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDA9.2".download]]
+    sha256 = "bdf95e5993b1fc0b26edea4cb66d6efbfd018a30d5231936ee384f8b3ab58ae6"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDA.v9.2.148.x86_64-linux-gnu.tar.gz"

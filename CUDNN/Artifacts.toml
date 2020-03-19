@@ -1,0 +1,117 @@
+[["CUDNN+CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "1de7a59df9e0b1eb6ba86c26b4823c2dedcd766d"
+lazy = true
+os = "macos"
+
+    [["CUDNN+CUDA10.0".download]]
+    sha256 = "0c029eaea51a4f6cf07cb5439bf216e98b44dc96b0c470069d9d428193601203"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-apple-darwin14.tar.gz"
+[["CUDNN+CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "5ce759e791547ca7e8e3ee55a328c00b7e092cfc"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDNN+CUDA10.0".download]]
+    sha256 = "9a3d9008e803b3749beeff9dcae0bdac87336df31ee588b1d5f82dd6e160114d"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-linux-gnu.tar.gz"
+[["CUDNN+CUDA10.0"]]
+arch = "x86_64"
+git-tree-sha1 = "b5b03171e14ec1f9a814e7d0a21f87a3ba8d7336"
+lazy = true
+os = "windows"
+
+    [["CUDNN+CUDA10.0".download]]
+    sha256 = "483ec7a4d21f9503730d005bc4e2e2fcd08e74bc3863566168a6c58c8802b061"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-w64-mingw32.tar.gz"
+
+[["CUDNN+CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "569b31535d57931bf67446dcf65daa2cf33c6519"
+lazy = true
+os = "macos"
+
+    [["CUDNN+CUDA10.1".download]]
+    sha256 = "338c028ab9e66063d5a41ceab1c888fb1124588ed0806f8fcd8c4c9a88cb6552"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-apple-darwin14.tar.gz"
+[["CUDNN+CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "9f46dd1d6301b685e3f530fa399270805e63ba66"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDNN+CUDA10.1".download]]
+    sha256 = "69c29148d0dd2b88b0e388c9c9a1dda46005704e2f978db1089352ba8ff1c939"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-linux-gnu.tar.gz"
+[["CUDNN+CUDA10.1"]]
+arch = "x86_64"
+git-tree-sha1 = "574ca8a700abab65e516f18d54579e7ce394c8f4"
+lazy = true
+os = "windows"
+
+    [["CUDNN+CUDA10.1".download]]
+    sha256 = "9adbd71db700ff1e84dfc03add198e83eeccebb83c7d2d36e2ddf8af4714a2fa"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-w64-mingw32.tar.gz"
+
+[["CUDNN+CUDA10.2"]]
+arch = "x86_64"
+git-tree-sha1 = "32ed1edca5897b2e7b5b0c4e89f9b3b5c5a0f685"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDNN+CUDA10.2".download]]
+    sha256 = "acf0198f5dc52272caa01f584c13f0c63f9076b23a77821f4124a9c3e96dd3d8"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-linux-gnu.tar.gz"
+[["CUDNN+CUDA10.2"]]
+arch = "x86_64"
+git-tree-sha1 = "f905a904e4b88515046e22e29b71c1f5ad161d9b"
+lazy = true
+os = "windows"
+
+    [["CUDNN+CUDA10.2".download]]
+    sha256 = "c93c071c0e92785b79d7f5039ae198e191959c4f839bd37802c04452f1a71506"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-w64-mingw32.tar.gz"
+
+[["CUDNN+CUDA9.0"]]
+arch = "x86_64"
+git-tree-sha1 = "27bcc386fb45a23d8f1807a6b62ca9d9b34b1540"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDNN+CUDA9.0".download]]
+    sha256 = "58dcb59247c36d4bc8918780fd2f7a03765f0cfb77d1726af52061c6b407873c"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-linux-gnu.tar.gz"
+[["CUDNN+CUDA9.0"]]
+arch = "x86_64"
+git-tree-sha1 = "8186c3fb24459b54a910534958775ee902702eac"
+lazy = true
+os = "windows"
+
+    [["CUDNN+CUDA9.0".download]]
+    sha256 = "4a0d103c3608b9c68c45c9d88eb94f0182758c6631cb6b0cd8921a74fae9cf3d"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-w64-mingw32.tar.gz"
+
+[["CUDNN+CUDA9.2"]]
+arch = "x86_64"
+git-tree-sha1 = "a6b37a4e3ccfdf1b52d80017088a7fa216f55466"
+lazy = true
+libc = "glibc"
+os = "linux"
+
+    [["CUDNN+CUDA9.2".download]]
+    sha256 = "1d3070ea7a1411ebf363951696eb160bce1c644b105baabcd11b5f5d34b4c6dc"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-linux-gnu.tar.gz"
+[["CUDNN+CUDA9.2"]]
+arch = "x86_64"
+git-tree-sha1 = "80ee17359bef9c51c8e234a04e2834b42fbf0449"
+lazy = true
+os = "windows"
+
+    [["CUDNN+CUDA9.2".download]]
+    sha256 = "e6c45269e417635c6b4345c5e1ba43e1589893368ffddd9a79376357c41889aa"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUDNN.v7.6.5.x86_64-w64-mingw32.tar.gz"
