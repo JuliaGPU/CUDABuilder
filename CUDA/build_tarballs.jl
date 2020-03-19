@@ -8,7 +8,7 @@ using BinaryBuilder
 # as per https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 
 name = "CUDA"
-tag = v"0.2.0"
+tag = v"0.3.0"
 
 dependencies = []
 
@@ -75,12 +75,16 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
     mv targets/x86_64-linux/lib .
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on Linux doesn't split in subprojects)
+    mv targets/x86_64-linux/include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.so* lib/libcudadevrt.a ${prefix}/lib
@@ -111,6 +115,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -118,6 +123,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.so* ${prefix}/lib
@@ -131,7 +137,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
@@ -140,33 +146,42 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Runtime
     mv cudart/bin/cudart64_*.dll ${prefix}/bin
     mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
+    mv nvcc/include/* ${prefix}/include
 
     # CUDA FFT Library
     mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
+    mv cufft_dev/include/* ${prefix}/include
 
     # CUDA BLAS Library
     mv cublas/bin/cublas64_*.dll cublas/bin/cublasLt64_*.dll ${prefix}/bin
+    mv cublas_dev/include/* ${prefix}/include
 
     # NVIDIA "Drop-in" BLAS Library
     mv cublas/bin/nvblas64_*.dll ${prefix}/bin
 
     # CUDA Sparse Matrix Library
     mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+    mv cusparse_dev/include/* ${prefix}/include
 
     # CUDA Linear Solver Library
     mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+    mv cusolver_dev/include/* ${prefix}/include
 
     # CUDA Random Number Generation Library
     mv curand/bin/curand64_*.dll ${prefix}/bin
+    mv curand_dev/include/* ${prefix}/include
 
     # CUDA Accelerated Graph Library
     mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+    mv nvgraph_dev/include/* ${prefix}/include
 
     # NVIDIA Performance Primitives Library
     mv npp/bin/npp*64_*.dll ${prefix}/bin
+    mv npp_dev/include/* ${prefix}/include
 
     # NVIDIA Optimizing Compiler Library
     mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+    mv nvcc/nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -174,9 +189,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv cupti/extras/CUPTI/lib64/cupti64_*.dll ${prefix}/bin
+    mv cupti/extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
-    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+    for file in nvtx_installer/*.*_*; do
+        mv $file $(echo $file | sed 's/\.\(\w*\)_.*/.\1/')
+    done
+    mv nvtx_installer/nvToolsExt64_1.dll ${prefix}/bin
+    mv nvtx_installer/*.h ${prefix}/include
 
     # CUDA Disassembler
     mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
@@ -260,12 +280,16 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
     mv targets/x86_64-linux/lib .
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on Linux doesn't split in subprojects)
+    mv targets/x86_64-linux/include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.so* lib/libcudadevrt.a ${prefix}/lib
@@ -296,6 +320,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -303,6 +328,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.so* ${prefix}/lib
@@ -316,7 +342,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
@@ -325,33 +351,42 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Runtime
     mv cudart/bin/cudart64_*.dll ${prefix}/bin
     mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
+    mv nvcc/include/* ${prefix}/include
 
     # CUDA FFT Library
     mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
+    mv cufft_dev/include/* ${prefix}/include
 
     # CUDA BLAS Library
     mv cublas/bin/cublas64_*.dll cublas/bin/cublasLt64_*.dll ${prefix}/bin
+    mv cublas_dev/include/* ${prefix}/include
 
     # NVIDIA "Drop-in" BLAS Library
     mv cublas/bin/nvblas64_*.dll ${prefix}/bin
 
     # CUDA Sparse Matrix Library
     mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+    mv cusparse_dev/include/* ${prefix}/include
 
     # CUDA Linear Solver Library
     mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+    mv cusolver_dev/include/* ${prefix}/include
 
     # CUDA Random Number Generation Library
     mv curand/bin/curand64_*.dll ${prefix}/bin
+    mv curand_dev/include/* ${prefix}/include
 
     # CUDA Accelerated Graph Library
     mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+    mv nvgraph_dev/include/* ${prefix}/include
 
     # NVIDIA Performance Primitives Library
     mv npp/bin/npp*64_*.dll ${prefix}/bin
+    mv npp_dev/include/* ${prefix}/include
 
     # NVIDIA Optimizing Compiler Library
     mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+    mv nvcc/nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -359,9 +394,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv cupti/extras/CUPTI/lib64/cupti64_*.dll ${prefix}/bin
+    mv cupti/extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
-    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+    for file in nvtx_installer/*.*_*; do
+        mv $file $(echo $file | sed 's/\.\(\w*\)_.*/.\1/')
+    done
+    mv nvtx_installer/nvToolsExt64_1.dll ${prefix}/bin
+    mv nvtx_installer/*.h ${prefix}/include
 
     # CUDA Disassembler
     mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
@@ -375,11 +415,15 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on macOS doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
@@ -410,6 +454,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -417,6 +462,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.*dylib ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.*dylib ${prefix}/lib
@@ -507,11 +553,15 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on Linux doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
@@ -542,6 +592,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -549,6 +600,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib64/libnvToolsExt.so* ${prefix}/lib
@@ -562,7 +614,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
@@ -571,33 +623,42 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Runtime
     mv cudart/bin/cudart64_*.dll ${prefix}/bin
     mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
+    mv nvcc/include/* ${prefix}/include
 
     # CUDA FFT Library
     mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
+    mv cufft_dev/include/* ${prefix}/include
 
     # CUDA BLAS Library
     mv cublas/bin/cublas64_*.dll ${prefix}/bin
+    mv cublas_dev/include/* ${prefix}/include
 
     # NVIDIA "Drop-in" BLAS Library
     mv cublas/bin/nvblas64_*.dll ${prefix}/bin
 
     # CUDA Sparse Matrix Library
     mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+    mv cusparse_dev/include/* ${prefix}/include
 
     # CUDA Linear Solver Library
     mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+    mv cusolver_dev/include/* ${prefix}/include
 
     # CUDA Random Number Generation Library
     mv curand/bin/curand64_*.dll ${prefix}/bin
+    mv curand_dev/include/* ${prefix}/include
 
     # CUDA Accelerated Graph Library
     mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+    mv nvgraph_dev/include/* ${prefix}/include
 
     # NVIDIA Performance Primitives Library
     mv npp/bin/npp*64_*.dll ${prefix}/bin
+    mv npp_dev/include/* ${prefix}/include
 
     # NVIDIA Optimizing Compiler Library
     mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+    mv nvcc/nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -605,9 +666,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv cupti/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+    mv cupti/extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
-    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+    for file in nvtx_installer/*.*_*; do
+        mv $file $(echo $file | sed 's/\.\(\w*\)_.*/.\1/')
+    done
+    mv nvtx_installer/nvToolsExt64_1.dll ${prefix}/bin
+    mv nvtx_installer/*.h ${prefix}/include
 
     # CUDA Disassembler
     mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
@@ -621,11 +687,15 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on macOS doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
@@ -656,6 +726,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -663,6 +734,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.*dylib ${prefix}/lib
@@ -752,11 +824,15 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on Linux doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
@@ -787,6 +863,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -794,6 +871,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib64/libnvToolsExt.so* ${prefix}/lib
@@ -807,7 +885,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
@@ -816,33 +894,42 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Runtime
     mv cudart/bin/cudart64_*.dll ${prefix}/bin
     mv nvcc/lib/x64/cudadevrt.lib ${prefix}/lib
+    mv nvcc/include/* ${prefix}/include
 
     # CUDA FFT Library
     mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
+    mv cufft_dev/include/* ${prefix}/include
 
     # CUDA BLAS Library
     mv cublas/bin/cublas64_*.dll ${prefix}/bin
+    mv cublas_dev/include/* ${prefix}/include
 
     # NVIDIA "Drop-in" BLAS Library
     mv cublas/bin/nvblas64_*.dll ${prefix}/bin
 
     # CUDA Sparse Matrix Library
     mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+    mv cusparse_dev/include/* ${prefix}/include
 
     # CUDA Linear Solver Library
     mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+    mv cusolver_dev/include/* ${prefix}/include
 
     # CUDA Random Number Generation Library
     mv curand/bin/curand64_*.dll ${prefix}/bin
+    mv curand_dev/include/* ${prefix}/include
 
     # CUDA Accelerated Graph Library
     mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+    mv nvgraph_dev/include/* ${prefix}/include
 
     # NVIDIA Performance Primitives Library
     mv npp/bin/npp*64_*.dll ${prefix}/bin
+    mv npp_dev/include/* ${prefix}/include
 
     # NVIDIA Optimizing Compiler Library
     mv nvcc/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+    mv nvcc/nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -850,9 +937,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv cupti/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+    mv cupti/extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
-    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+    for file in nvtx_installer/*.*_*; do
+        mv $file $(echo $file | sed 's/\.\(\w*\)_.*/.\1/')
+    done
+    mv nvtx_installer/nvToolsExt64_1.dll ${prefix}/bin
+    mv nvtx_installer/*.h ${prefix}/include
 
     # CUDA Disassembler
     mv nvdisasm/bin/nvdisasm.exe ${prefix}/bin
@@ -865,11 +957,15 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on macOS doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
@@ -900,6 +996,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -907,6 +1004,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.*dylib ${prefix}/lib
@@ -996,11 +1094,15 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on Linux doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib64/libcudart.so* lib64/libcudadevrt.a ${prefix}/lib
@@ -1031,6 +1133,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib64/libnvvm.so* ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -1038,6 +1141,7 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib64/libcupti.so* ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib64/libnvToolsExt.so* ${prefix}/lib
@@ -1051,7 +1155,7 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
@@ -1060,33 +1164,42 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     # CUDA Runtime
     mv cudart/bin/cudart64_*.dll ${prefix}/bin
     mv compiler/lib/x64/cudadevrt.lib ${prefix}/lib
+    mv compiler/include/* ${prefix}/include
 
     # CUDA FFT Library
     mv cufft/bin/cufft64_*.dll cufft/bin/cufftw64_*.dll ${prefix}/bin
+    mv cufft_dev/include/* ${prefix}/include
 
     # CUDA BLAS Library
     mv cublas/bin/cublas64_*.dll ${prefix}/bin
+    mv cublas_dev/include/* ${prefix}/include
 
     # NVIDIA "Drop-in" BLAS Library
     mv cublas/bin/nvblas64_*.dll ${prefix}/bin
 
     # CUDA Sparse Matrix Library
     mv cusparse/bin/cusparse64_*.dll ${prefix}/bin
+    mv cusparse_dev/include/* ${prefix}/include
 
     # CUDA Linear Solver Library
     mv cusolver/bin/cusolver64_*.dll ${prefix}/bin
+    mv cusolver_dev/include/* ${prefix}/include
 
     # CUDA Random Number Generation Library
     mv curand/bin/curand64_*.dll ${prefix}/bin
+    mv curand_dev/include/* ${prefix}/include
 
     # CUDA Accelerated Graph Library
     mv nvgraph/bin/nvgraph64_*.dll ${prefix}/bin
+    mv nvgraph_dev/include/* ${prefix}/include
 
     # NVIDIA Performance Primitives Library
     mv npp/bin/npp*64_*.dll ${prefix}/bin
+    mv npp_dev/include/* ${prefix}/include
 
     # NVIDIA Optimizing Compiler Library
     mv compiler/nvvm/bin/nvvm64_*.dll ${prefix}/bin
+    mv compiler/nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -1094,9 +1207,14 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv command_line_tools/extras/CUPTI/libx64/cupti64_*.dll ${prefix}/bin
+    mv command_line_tools/extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
-    mv nvtx_installer/nvToolsExt64_1.dll* ${prefix}/bin/nvToolsExt64_1.dll
+    for file in nvtx_installer/*.*_*; do
+        mv $file $(echo $file | sed 's/\.\(\w*\)_.*/.\1/')
+    done
+    mv nvtx_installer/nvToolsExt64_1.dll ${prefix}/bin
+    mv nvtx_installer/*.h ${prefix}/include
 
     # CUDA Disassembler
     mv compiler/bin/nvdisasm.exe ${prefix}/bin
@@ -1109,11 +1227,15 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
     find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDA
     mv EULA.txt ${prefix}/share/licenses/CUDA/
+
+    # headers (we copy them all, CUDA on macOS doesn't split in subprojects)
+    mv include/* ${prefix}/include
+    rm -rf ${prefix}/include/thrust
 
     # CUDA Runtime
     mv lib/libcudart.*dylib lib/libcudadevrt.a ${prefix}/lib
@@ -1144,6 +1266,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # NVIDIA Optimizing Compiler Library
     mv nvvm/lib/libnvvm.*dylib ${prefix}/lib
+    mv nvvm/include/* ${prefix}/include
 
     # NVIDIA Common Device Math Functions Library
     mkdir ${prefix}/share/libdevice
@@ -1151,6 +1274,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # CUDA Profiling Tools Interface (CUPTI) Library
     mv extras/CUPTI/lib/libcupti.*dylib ${prefix}/lib
+    mv extras/CUPTI/include/* ${prefix}/include
 
     # NVIDIA Tools Extension Library
     mv lib/libnvToolsExt.*dylib ${prefix}/lib

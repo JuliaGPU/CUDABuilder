@@ -1,7 +1,7 @@
 using BinaryBuilder
 
 name = "CUTENSOR"
-tag = v"0.2.0"
+tag = v"0.3.0"
 
 dependencies = []
 
@@ -26,16 +26,15 @@ sources_linux = [
 cuda_version = v"10.2"
 output[cuda_version] = Dict()
 
-version = VersionNumber("$(cutensor_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
 script = raw"""
 cd ${WORKSPACE}/srcdir
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
     cd libcutensor
+    find .
 
     # prepare
-    mkdir ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUTENSOR
@@ -43,10 +42,11 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUTENSOR Library
     mv lib/10.2/libcutensor.so* ${prefix}/lib
+    mv include/* ${prefix}/include
 fi
 """
 
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cutensor_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 
 
 #
@@ -56,16 +56,15 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, 
 cuda_version = v"10.1"
 output[cuda_version] = Dict()
 
-version = VersionNumber("$(cutensor_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
 script = raw"""
 cd ${WORKSPACE}/srcdir
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
     cd libcutensor
+    find .
 
     # prepare
-    mkdir ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUTENSOR
@@ -73,10 +72,11 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUTENSOR Library
     mv lib/10.1/libcutensor.so* ${prefix}/lib
+    mv include/* ${prefix}/include
 fi
 """
 
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cutensor_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
 
 
 #

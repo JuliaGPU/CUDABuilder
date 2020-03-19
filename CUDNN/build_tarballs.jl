@@ -1,7 +1,7 @@
 using BinaryBuilder
 
 name = "CUDNN"
-tag = v"0.2.0"
+tag = v"0.3.0"
 
 dependencies = []
 
@@ -14,9 +14,10 @@ cd ${WORKSPACE}/srcdir
 
 if [[ ${target} == x86_64-linux-gnu ]]; then
     cd cuda
+    find .
 
     # prepare
-    mkdir ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
@@ -24,11 +25,13 @@ if [[ ${target} == x86_64-linux-gnu ]]; then
 
     # CUDNN Library
     mv lib64/libcudnn.so* ${prefix}/lib
+    mv include/* ${prefix}/include
 elif [[ ${target} == x86_64-w64-mingw32 ]]; then
     cd cuda
+    find .
 
     # prepare
-    mkdir ${prefix}/bin ${prefix}/share
+    mkdir ${prefix}/bin ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
@@ -36,11 +39,13 @@ elif [[ ${target} == x86_64-w64-mingw32 ]]; then
 
     # CUDNN Library
     mv bin/cudnn64_*.dll ${prefix}/bin
+    mv include/* ${prefix}/include
 elif [[ ${target} == x86_64-apple-darwin* ]]; then
     cd cuda
+    find .
 
     # prepare
-    mkdir ${prefix}/lib ${prefix}/share
+    mkdir ${prefix}/lib ${prefix}/share ${prefix}/include
 
     # license
     mkdir -p ${prefix}/share/licenses/CUDNN
@@ -48,6 +53,7 @@ elif [[ ${target} == x86_64-apple-darwin* ]]; then
 
     # CUDNN Library
     mv lib/libcudnn.*dylib ${prefix}/lib
+    mv include/* ${prefix}/include
 fi
 """
 
@@ -72,10 +78,8 @@ sources_windows = [
     "fba812f60c61bc33b81db06cd55e8d769774d036186571d724295c71c9936064"
 ]
 
-version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -98,11 +102,9 @@ sources_windows = [
     "5e4275d738cc3a105cf6558b70b8a2ff514989ca1cd17bc8515086e20561a652"
 ]
 
-version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -125,11 +127,9 @@ sources_windows = [
     "2767db23ae2cd869ac008235e2adab81430f951a92a62160884c80ab5902b9e8"
 ]
 
-version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_macos, script, [MacOS(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -148,10 +148,8 @@ sources_windows = [
     "ffa553df2e9af1703bb7786a784356989dac5c415bf5bca73e52b1789ddd4984"
 ]
 
-version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
@@ -170,10 +168,8 @@ sources_windows = [
     "c7401514a6d7d24e8541f88c12e4328f165b5c5afd010ee462d356cac2158268"
 ]
 
-version = VersionNumber("$(cudnn_version)+cuda$(cuda_version.major).$(cuda_version.minor)")
-
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
-merge!(output[cuda_version], build_tarballs(ARGS, name, version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_linux, script, [Linux(:x86_64)], products, dependencies))
+merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_windows, script, [Windows(:x86_64)], products, dependencies))
 
 
 #
