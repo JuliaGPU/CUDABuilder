@@ -9,12 +9,11 @@ macos="x86_64-apple-darwin14"
 
 
 # precompile
-julia -e "using BinaryBuilder"
-mkdir build
+julia --project -e "using BinaryBuilder"
 
 
 rm -rf build products
-
+mkdir build products
 
 cuda="julia --project CUDA/build_tarballs.jl"
 
