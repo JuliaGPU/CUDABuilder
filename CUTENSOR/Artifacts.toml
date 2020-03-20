@@ -118,22 +118,22 @@ os = "linux"
 
 [["CUTENSOR+CUDA10.1"]]
 arch = "x86_64"
-git-tree-sha1 = "8b7a169928260fdf8b10184a9929d057d3e52872"
+git-tree-sha1 = "6b9e321e62a27270f7c72b90dffcfb44a7531ad2"
 lazy = true
 libc = "glibc"
 os = "linux"
 
     [["CUTENSOR+CUDA10.1".download]]
-    sha256 = "45b982da8e83270c1af2825e37ae87145c4d7465c5aa451d34f7c392f02c6358"
-    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUTENSOR.v1.0.1.x86_64-linux-gnu.tar.gz"
+    sha256 = "57e24cfde8e6ef9fe2a35a2a9fdb2a618d7d65ccf69a3358aaf6a128e0b701d7"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUTENSOR+CUDA10.1.v1.0.1.x86_64-linux-gnu.tar.gz"
 
 [["CUTENSOR+CUDA10.2"]]
 arch = "x86_64"
-git-tree-sha1 = "48aa0f40d7fda787be06754abe472ecb3babbd05"
+git-tree-sha1 = "78d80f7459d135876bcdee46feadb410728cb5cf"
 lazy = true
 libc = "glibc"
 os = "linux"
 
     [["CUTENSOR+CUDA10.2".download]]
-    sha256 = "b57b37660a47cce37cf4cb37aea430360a37d3b8325ec1fd6c4daf63a01d79bd"
-    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUTENSOR.v1.0.1.x86_64-linux-gnu.tar.gz"
+    sha256 = "e3d59b56dbb836ab1c27628172356d5adcfb770eb303a35dd615f6c1fedeb459"
+    url = "https://github.com/JuliaGPU/CUDABuilder/releases/download/v0.3.0/CUTENSOR+CUDA10.2.v1.0.1.x86_64-linux-gnu.tar.gz"

@@ -1,6 +1,5 @@
 using BinaryBuilder
 
-name = "CUDNN"
 tag = v"0.3.0"
 
 dependencies = []
@@ -68,6 +67,7 @@ products = [
 
 cuda_version = v"10.2"
 output[cuda_version] = Dict()
+name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.2_20191118/cudnn-10.2-linux-x64-v7.6.5.32.tgz" =>
@@ -88,6 +88,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_w
 
 cuda_version = v"10.1"
 output[cuda_version] = Dict()
+name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.1_20191031/cudnn-10.1-linux-x64-v7.6.5.32.tgz" =>
@@ -113,6 +114,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_w
 
 cuda_version = v"10.0"
 output[cuda_version] = Dict()
+name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.0_20191031/cudnn-10.0-linux-x64-v7.6.5.32.tgz" =>
@@ -138,6 +140,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_w
 
 cuda_version = v"9.2"
 output[cuda_version] = Dict()
+name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/9.2_20191031/cudnn-9.2-linux-x64-v7.6.5.32.tgz" =>
@@ -158,6 +161,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, cudnn_version, sources_w
 
 cuda_version = v"9.0"
 output[cuda_version] = Dict()
+name = "CUDNN+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 sources_linux = [
     "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/9.0_20191031/cudnn-9.0-linux-x64-v7.6.5.32.tgz" =>

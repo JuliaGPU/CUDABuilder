@@ -1,6 +1,5 @@
 using BinaryBuilder
 
-name = "CUTENSOR"
 tag = v"0.3.0"
 
 dependencies = []
@@ -25,6 +24,7 @@ sources_linux = [
 
 cuda_version = v"10.2"
 output[cuda_version] = Dict()
+name = "CUTENSOR+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 script = raw"""
 cd ${WORKSPACE}/srcdir
@@ -55,6 +55,7 @@ merge!(output[cuda_version], build_tarballs(ARGS, name, cutensor_version, source
 
 cuda_version = v"10.1"
 output[cuda_version] = Dict()
+name = "CUTENSOR+CUDA$(cuda_version.major).$(cuda_version.minor)"
 
 script = raw"""
 cd ${WORKSPACE}/srcdir
